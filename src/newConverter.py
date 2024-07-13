@@ -47,6 +47,18 @@ def idx_to_pos(n, y_len = 8):
     return (x,y)
 
 
+def pos_to_idx(x,y, y_len=8):
+    n_row = x * y_len
+    up_row = x % 2
+
+    if up_row:
+        n = n_row + y_len - 1 - y
+    else:
+        n = n_row + y
+
+    return n
+
+
 def pixel_to_data(pix, out_name):
     lines = f"byte {out_name}[] = " + "{\n"
     for i in range(0, img.width*img.height):
@@ -125,7 +137,6 @@ for img, img_path in img_tup:
 
 
 if __name__ == "__main__":
-    pass
-    # for i in range(0,24):
-    #     print(idx_to_pos(i,5))
+    for i in range(-20,0):
+        print(idx_to_pos(i,5))
 

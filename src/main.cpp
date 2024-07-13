@@ -10,12 +10,15 @@
 #include <Adafruit_NeoPixel.h>
 #include "led_matrix_data.h"
 #include "led_matrix_color_data.h"
-// #include "table.h"
+#include "table.h"
 #include <IRremoteESP8266.h>
 #include <IRrecv.h>
 
 #define PIN_WS2812B 21  // The ESP32 pin GPIO16 connected to WS2812B
 #define NUM_PIXELS 256   // The number of LEDs (pixels) on WS2812B LED strip
+#define PIXELS_HEIGHT 8
+#define PIXELS_WIDTH 32
+
 
 Adafruit_NeoPixel ws2812b(NUM_PIXELS, PIN_WS2812B, NEO_GRB + NEO_KHZ800);
 
@@ -26,8 +29,8 @@ IRrecv irrecv(RECV_PIN);
 decode_results results;
 
 
-uint32_t* frames[] = { test_color, black_color, white_color, i_color, K_color, A_color };
-size_t frame_sizes[] = { test_color_size, black_color_size, white_color_size, i_color_size, K_color_size, A_color_size };
+uint32_t* frames[] = { test_color, black_color, white_color, I_color, K_color, A_color };
+size_t frame_sizes[] = { test_color_size, black_color_size, white_color_size, I_color_size, K_color_size, A_color_size };
 int i_frame = 0;
 
 void setup() {
@@ -44,37 +47,60 @@ void loop() {
 	if (irrecv.decode(&results)) {
 		Serial.println(results.value, HEX);
 		irrecv.resume(); // Receive the next value
-		i_frame = (i_frame + 1) % (sizeof(frames) / sizeof(uint32_t*));
+		i_frame = i_frame + 1;//(i_frame + 1) % (sizeof(frames) / sizeof(uint32_t*));
+		if (i_frame > 40) i_frame = -10;
 	}
 
 	// ws2812b.clear();  // set all pixel colors to 'off'. It only takes effect if pixels.show() is called
 
-	uint32_t* frame = frames[i_frame];
-	size_t frame_len = frame_sizes[i_frame];
+	// uint32_t* frame = frames[i_frame];
+	// size_t frame_len = frame_sizes[i_frame];
 
-	// turn pixels to green one-by-one with delay between each pixel
-	for (int pixel = 0; pixel < NUM_PIXELS && pixel < frame_len; pixel++) {         // for each pixel
-		ws2812b.setPixelColor(pixel, frame[pixel]);  // it only takes effect if pixels.show() is called
+	// // turn pixels to green one-by-one with delay between each pixel
+	// for (int pixel = 0; pixel < NUM_PIXELS && pixel < frame_len; pixel++) {         // for each pixel
+	// 	ws2812b.setPixelColor(pixel, frame[pixel]);  // it only takes effect if pixels.show() is called
 
-		// delay(5);  // 500ms pause between each pixel
-	}
+	// 	// delay(5);  // 500ms pause between each pixel
+	// }
+
+	display_char(i_frame, 'K');
+
 	ws2812b.show();                                          // update to the WS2812B Led Strip
-
-	// turn off all pixels for two seconds
-	// ws2812b.clear();
-	// ws2812b.show();  // update to the WS2812B Led Strip
 	return;
-	delay(2000);     // 2 seconds off time
-
-	// turn on all pixels to red at the same time for two seconds
-	for (int pixel = 0; pixel < NUM_PIXELS; pixel++) {         // for each pixel
-		ws2812b.setPixelColor(pixel, ws2812b.Color(255, 0, 0));  // it only takes effect if pixels.show() is called
-	}
-	ws2812b.show();  // update to the WS2812B Led Strip
-	delay(1000);     // 1 second on time
-
-	// turn off all pixels for one seconds
-	ws2812b.clear();
-	ws2812b.show();  // update to the WS2812B Led Strip
-	delay(1000);     // 1 second off time
 }
+
+void display_char(int x_pos, char c) {
+
+	byte* disp_frame = char_to_led_data(c);
+	int frame_px_len = sizeof(A) / sizeof(A[0]); // Assume Every Char has the Same Size
+	int frame_width = frame_px_len / PIXELS_HEIGHT;
+	if (x_pos + frame_width <= 0 || x_pos >= PIXELS_WIDTH) return;
+
+	// Start Position of Frame, Top Left if even, Bottom Left if uneven
+	int x_start = x_pos * PIXELS_HEIGHT;
+	// if (x_pos % 2)
+	// 	x_start += PIXELS_HEIGHT - 1;
+
+	// If x_pos < 0, or x_pos > x_len - frame_width
+
+
+	
+	if (x_pos % 2) {
+		int frame_idx = PIXELS_HEIGHT -1;
+		for (int px = x_start; px < NUM_PIXELS && px < frame_px_len; px++) {
+			if (px >= 0) ws2812b.setPixelColor(px, disp_frame[frame_idx]);
+			frame_idx--;
+			if (frame_idx % PIXELS_HEIGHT == 0)
+				frame_idx += 2 * PIXELS_HEIGHT - 1;
+		}
+	} else {
+		int frame_idx = 0;
+		for (int px = x_start; px < NUM_PIXELS && px < frame_px_len; px++) {
+			frame_idx++;
+			if (px >= 0) ws2812b.setPixelColor(px, disp_frame[frame_idx]);
+		}
+	}
+		
+
+}
+

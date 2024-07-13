@@ -6,8 +6,6 @@
 #include "led_matrix_data.h"
 #endif
 
-// hmm
-
 byte* char_to_led_data(char c) {
 	byte* ret = A;
 	switch (c) {
