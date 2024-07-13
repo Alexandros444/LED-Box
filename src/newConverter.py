@@ -25,6 +25,7 @@ imgs = []
 
 img_dir = "img"
 out_file = "include/led_matrix_data.h"
+out_file_color = "include/led_matrix_color_data.h"
 
 
 def idx_to_pos(n, y_len = 8):
@@ -60,7 +61,7 @@ def pixel_to_data(pix, out_name):
 
 
 
-def pixel_to_Color_data(pix, out_name):
+def pixel_to_color_data(pix, out_name):
     """
     32 Bit, WRGB each 8-Bit in this order MSB White, LSB Blue
     """
@@ -90,6 +91,9 @@ img_tup : tuple[Image.Image,str] = zip(imgs,img_paths)
 with open(out_file,"wt") as out:
     out.write("#ifndef byte\n#include <Arduino.h>\n#endif\n\n")
 
+with open(out_file_color,"wt") as out:
+    out.write("#ifndef byte\n#include <Arduino.h>\n#endif\n\n")
+
 for img, img_path in img_tup:
     symbol_name = Path(img_path).stem
     
@@ -97,12 +101,23 @@ for img, img_path in img_tup:
     pix = img.load()
     print(img_path,img.size)
     
-    lines = pixel_to_Color_data(pix, symbol_name)
+    # Data output
+    lines = pixel_to_data(pix, symbol_name)
     lines += f"size_t {symbol_name}_size = sizeof({symbol_name}) / sizeof({symbol_name}[0]);\n"
     lines += "\n"
 
     with open(out_file,"at") as out:
         out.write(lines)
+
+    symbol_name = symbol_name+"_color"
+    # Color Data output
+    lines = pixel_to_color_data(pix, symbol_name)
+    lines += f"size_t {symbol_name}_size = sizeof({symbol_name}) / sizeof({symbol_name}[0]);\n"
+    lines += "\n"
+
+    with open(out_file_color,"at") as out:
+        out.write(lines)
+
     
     img.close()
 
