@@ -6,7 +6,7 @@
 
 # Code
 - Mapping von x,y auf LEDs  - DONE
-- Python Script für Image to Frame. Max 8x32px (Alternativ, python script so, dass Frames in Index reihenfolge vorliegen)
+- Python Script für Image to Frame. Max 8x32px (Alternativ, python script so, dass Frames in Index reihenfolge vorliegen) - Done
 - Alle Buchstaben in 8x4~8x format als BW Frame (Uint8 Arrays)
 - Frame Darstellen, Start position veränderbar machen, bis in bild rein, und aus bild raus (ins minus / über 32)
 - Symbole Herz etc. ("Movie")

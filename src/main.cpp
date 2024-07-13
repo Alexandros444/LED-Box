@@ -8,7 +8,7 @@
 
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
-#include "led_matrix.h"
+#include "led_matrix_data.h"
 #include <IRremoteESP8266.h>
 #include <IRrecv.h>
 
@@ -24,6 +24,10 @@ IRrecv irrecv(RECV_PIN);
 decode_results results;
 
 
+uint32_t* frames[] = { test, black, white, i, K, A };
+size_t frame_sizes[] = { test_size, black_size, white_size, i_size, K_size, A_size };
+int i_frame = 0;
+
 void setup() {
   Serial.begin(115200);
 
@@ -37,21 +41,25 @@ void loop() {
   if (irrecv.decode(&results)) {
     Serial.println(results.value, HEX);
     irrecv.resume(); // Receive the next value
+    i_frame = (i_frame + 1) % (sizeof(frames) / sizeof(uint32_t*));
   }
 
-  ws2812b.clear();  // set all pixel colors to 'off'. It only takes effect if pixels.show() is called
+  // ws2812b.clear();  // set all pixel colors to 'off'. It only takes effect if pixels.show() is called
 
+  uint32_t* frame = frames[i_frame];
+  size_t frame_len = frame_sizes[i_frame];
+  
   // turn pixels to green one-by-one with delay between each pixel
-  for (int pixel = 0; pixel < NUM_PIXELS; pixel++) {         // for each pixel
-    ws2812b.setPixelColor(pixel, ws2812b.Color(0, 255, 0));  // it only takes effect if pixels.show() is called
-    ws2812b.show();                                          // update to the WS2812B Led Strip
+  for (int pixel = 0; pixel < NUM_PIXELS && pixel < frame_len; pixel++) {         // for each pixel
+    ws2812b.setPixelColor(pixel, frame[pixel]);  // it only takes effect if pixels.show() is called
 
-    delay(5);  // 500ms pause between each pixel
+    // delay(5);  // 500ms pause between each pixel
   }
+  ws2812b.show();                                          // update to the WS2812B Led Strip
 
   // turn off all pixels for two seconds
-  ws2812b.clear();
-  ws2812b.show();  // update to the WS2812B Led Strip
+  // ws2812b.clear();
+  // ws2812b.show();  // update to the WS2812B Led Strip
   return;
   delay(2000);     // 2 seconds off time
 
