@@ -95,10 +95,10 @@ void display_char(int x_pos, char c) {
 
 	
 	if (x_pos % 2) {
-		Serial.printf("\nungerade,%d %d\n\n",x_start, x_pos);
+		// Serial.printf("\nungerade,%d %d\n\n",x_start, x_pos);
 		int frame_idx = PIXELS_HEIGHT -1;
 		for (int px = x_start; px < NUM_PIXELS && frame_idx < frame_px_len; px++) {
-			Serial.printf("px %d, fidx %d\n",px,frame_idx);
+			// Serial.printf("px %d, fidx %d\n",px,frame_idx);
 			if (px >= 0) {
 				uint32_t col = ws2812b.Color(255 * disp_frame[frame_idx], 255 * disp_frame[frame_idx], 255 * disp_frame[frame_idx]);
 				ws2812b.setPixelColor(px, col);
