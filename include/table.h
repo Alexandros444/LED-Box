@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #endif
 
-#ifndef A
+#ifndef A_size
 #include "led_matrix_data.h"
 #endif
 

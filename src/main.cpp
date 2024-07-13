@@ -8,7 +8,7 @@
 
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
-#include "led_matrix_data.h"
+// #include "led_matrix_data.h"
 #include "led_matrix_color_data.h"
 #include "table.h"
 #include <IRremoteESP8266.h>
@@ -39,7 +39,7 @@ void setup() {
 	irrecv.enableIRIn(); // Start the receiver
 
 	ws2812b.begin();  // initialize WS2812B strip object (REQUIRED)
-	ws2812b.setBrightness(128);
+	ws2812b.setBrightness(50);
 }
 
 void loop() {
@@ -88,7 +88,10 @@ void display_char(int x_pos, char c) {
 	if (x_pos % 2) {
 		int frame_idx = PIXELS_HEIGHT -1;
 		for (int px = x_start; px < NUM_PIXELS && px < frame_px_len; px++) {
-			if (px >= 0) ws2812b.setPixelColor(px, disp_frame[frame_idx]);
+			if (px >= 0) {
+				uint32_t col = ws2812b.Color(255 * disp_frame[frame_idx], 255 * disp_frame[frame_idx], 255 * disp_frame[frame_idx]);
+				ws2812b.setPixelColor(px, col);
+			}
 			frame_idx--;
 			if (frame_idx % PIXELS_HEIGHT == 0)
 				frame_idx += 2 * PIXELS_HEIGHT - 1;
@@ -97,7 +100,10 @@ void display_char(int x_pos, char c) {
 		int frame_idx = 0;
 		for (int px = x_start; px < NUM_PIXELS && px < frame_px_len; px++) {
 			frame_idx++;
-			if (px >= 0) ws2812b.setPixelColor(px, disp_frame[frame_idx]);
+			if (px >= 0) {
+				uint32_t col = ws2812b.Color(255 * disp_frame[frame_idx], 255 * disp_frame[frame_idx], 255 * disp_frame[frame_idx]);
+				ws2812b.setPixelColor(px, col);
+			}
 		}
 	}
 		
