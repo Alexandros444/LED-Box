@@ -33,6 +33,8 @@ uint32_t* frames[] = { test_color, black_color, white_color, I_color, K_color, A
 size_t frame_sizes[] = { test_color_size, black_color_size, white_color_size, I_color_size, K_color_size, A_color_size };
 int i_frame = 0;
 
+void display_char(int x_pos, char c);
+
 void setup() {
 	Serial.begin(115200);
 
@@ -42,12 +44,19 @@ void setup() {
 	ws2812b.setBrightness(50);
 }
 
+uint32_t last_ir_code = 0;
+int ir_inc_dec = 1;
+
 void loop() {
 
 	if (irrecv.decode(&results)) {
 		Serial.println(results.value, HEX);
+		if (results.value != last_ir_code){
+			last_ir_code = results.value;
+			ir_inc_dec = -ir_inc_dec;
+		}
 		irrecv.resume(); // Receive the next value
-		i_frame = i_frame + 1;//(i_frame + 1) % (sizeof(frames) / sizeof(uint32_t*));
+		i_frame = i_frame + ir_inc_dec;//(i_frame + 1) % (sizeof(frames) / sizeof(uint32_t*));
 		if (i_frame > 40) i_frame = -10;
 	}
 
@@ -86,24 +95,26 @@ void display_char(int x_pos, char c) {
 
 	
 	if (x_pos % 2) {
+		Serial.printf("\nungerade,%d %d\n\n",x_start, x_pos);
 		int frame_idx = PIXELS_HEIGHT -1;
-		for (int px = x_start; px < NUM_PIXELS && px < frame_px_len; px++) {
+		for (int px = x_start; px < NUM_PIXELS && frame_idx < frame_px_len; px++) {
+			Serial.printf("px %d, fidx %d\n",px,frame_idx);
 			if (px >= 0) {
 				uint32_t col = ws2812b.Color(255 * disp_frame[frame_idx], 255 * disp_frame[frame_idx], 255 * disp_frame[frame_idx]);
 				ws2812b.setPixelColor(px, col);
 			}
-			frame_idx--;
 			if (frame_idx % PIXELS_HEIGHT == 0)
-				frame_idx += 2 * PIXELS_HEIGHT - 1;
+				frame_idx += 2 * PIXELS_HEIGHT;
+			frame_idx--;
 		}
 	} else {
 		int frame_idx = 0;
-		for (int px = x_start; px < NUM_PIXELS && px < frame_px_len; px++) {
-			frame_idx++;
+		for (int px = x_start; px < NUM_PIXELS && frame_idx < frame_px_len; px++) {
 			if (px >= 0) {
 				uint32_t col = ws2812b.Color(255 * disp_frame[frame_idx], 255 * disp_frame[frame_idx], 255 * disp_frame[frame_idx]);
 				ws2812b.setPixelColor(px, col);
 			}
+			frame_idx++;
 		}
 	}
 		
