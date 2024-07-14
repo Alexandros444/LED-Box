@@ -15,18 +15,17 @@
 #include <IRremoteESP8266.h>
 #include <IRrecv.h>
 
+#define RECV_PIN 19
 #define PIN_WS2812B 21  // The ESP32 pin GPIO16 connected to WS2812B
 #define NUM_PIXELS 256   // The number of LEDs (pixels) on WS2812B LED strip
 #define PIXELS_HEIGHT 8
 #define PIXELS_WIDTH 32
+#define CHAR_WIDTH 5
 
 
 Adafruit_NeoPixel ws2812b(NUM_PIXELS, PIN_WS2812B, NEO_GRB + NEO_KHZ800);
 
-#define RECV_PIN 19
-
 IRrecv irrecv(RECV_PIN);
-
 decode_results results;
 
 uint32_t* frames[] = { test_color, black_color, white_color, I_color, K_color, A_color };
@@ -34,6 +33,16 @@ size_t frame_sizes[] = { test_color_size, black_color_size, white_color_size, I_
 int i_frame = 0;
 
 void display_char(int x_pos, char c);
+void disp_str(String str, int offset);
+void receive_ir_code(uint32_t code);
+
+bool is_on = true;
+uint8_t brightness = 100;
+uint8_t max_bright = 150;
+uint8_t step_bright = 10;
+
+uint32_t last_ir_code = 0;
+int ir_inc_dec = 1;
 
 void setup() {
 	Serial.begin(115200);
@@ -44,9 +53,6 @@ void setup() {
 	ws2812b.setBrightness(50);
 }
 
-uint32_t last_ir_code = 0;
-int ir_inc_dec = 1;
-
 void loop() {
 
 	if (irrecv.decode(&results)) {
@@ -56,8 +62,7 @@ void loop() {
 			ir_inc_dec = -ir_inc_dec;
 		}
 		irrecv.resume(); // Receive the next value
-		i_frame = i_frame + ir_inc_dec;//(i_frame + 1) % (sizeof(frames) / sizeof(uint32_t*));
-		if (i_frame > 40) i_frame = -10;
+		receive_ir_code(results.value);
 	}
 
 	// ws2812b.clear();  // set all pixel colors to 'off'. It only takes effect if pixels.show() is called
@@ -71,11 +76,30 @@ void loop() {
 
 	// 	// delay(5);  // 500ms pause between each pixel
 	// }
-
-	display_char(i_frame, 'K');
-
+	if (is_on) disp_str("Kalina", i_frame);
+	else ws2812b.clear();
+	
 	ws2812b.show();                                          // update to the WS2812B Led Strip
 	return;
+}
+
+
+void receive_ir_code(uint32_t code) {
+	switch (code){
+	case Off_code:
+		is_on = false;
+		break;
+	case On_code:
+		is_on = true;
+	case bright_code:
+		brightness += 10;
+		if (brightness > max_bright)brightness = max_bright;
+	case dim_code:
+		if (brightness < brightness - step_bright) brightness = 0;
+		else brightness -= 10;
+	default:
+		break;
+	}
 }
 
 void display_char(int x_pos, char c) {
@@ -100,7 +124,7 @@ void display_char(int x_pos, char c) {
 		for (int px = x_start; px < NUM_PIXELS && frame_idx < frame_px_len; px++) {
 			// Serial.printf("px %d, fidx %d\n",px,frame_idx);
 			if (px >= 0) {
-				uint32_t col = ws2812b.Color(255 * disp_frame[frame_idx], 255 * disp_frame[frame_idx], 255 * disp_frame[frame_idx]);
+				uint32_t col = ws2812b.Color(brightness * disp_frame[frame_idx], brightness * disp_frame[frame_idx], brightness * disp_frame[frame_idx]);
 				ws2812b.setPixelColor(px, col);
 			}
 			if (frame_idx % PIXELS_HEIGHT == 0)
@@ -121,3 +145,11 @@ void display_char(int x_pos, char c) {
 
 }
 
+void disp_str(String str, int offset) {
+	Serial.print("Displaying: ");
+	Serial.println(str);
+	Serial.printf("Lenght: %d", str.length());
+	for (int i = 0; i < str.length(); i++) {
+		display_char(i * CHAR_WIDTH + offset, str[i]);
+	}
+}
