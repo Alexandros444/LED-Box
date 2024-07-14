@@ -37,17 +37,27 @@ bool is_i_run = false;
 void display_char(int x_pos, char c);
 void disp_str(String str, int offset);
 void receive_ir_code(uint32_t code);
+void set_scroll_disp_str(String str);
+void scroll_disp_str(String str);
 
 bool is_on = true;
-uint8_t brightness = 0;
+uint8_t brightness = 1;
 uint8_t max_bright = 150;
 uint8_t step_bright = 1;
 
 uint32_t last_ir_code = 0;
 int ir_inc_dec = 1;
 
-unsigned int frame_ms = 1000;
+unsigned int frame_ms = 100;
 long last_frame = 0;
+
+int scroll_offset = 0;
+int scroll_distance = 0;
+String scroll_string = "";
+int scroll_width = 0;
+int scroll_dir = 1;
+bool bounce = true;
+bool bounce_at_str_start = true;
 
 void setup() {
 	Serial.begin(115200);
@@ -77,11 +87,13 @@ void loop() {
 
 	// 	// delay(5);  // 500ms pause between each pixel
 	// }
-	if (is_i_run && millis() > last_frame + frame_ms){
+	if (millis() > last_frame + frame_ms){
 		last_frame = millis();
-		i_frame++;
+		scroll_disp_str("Kalina");
+		Serial.printf("Scroll offset: %d\nScroll dir: %d\n",scroll_offset, scroll_dir);
 	} 
-	if (i_frame > PIXELS_WIDTH) i_frame = - 6 * CHAR_WIDTH;
+
+	// if (i_frame > PIXELS_WIDTH) i_frame = - 6 * CHAR_WIDTH;
 	if (!is_on)
 		ws2812b.clear();
 	// 	disp_str("Kalina", i_frame);
@@ -104,6 +116,7 @@ void receive_ir_code(uint32_t code) {
 	case bright_code:
 		brightness += step_bright;
 		if (brightness > max_bright)brightness = max_bright;
+		Serial.print(brightness);
 		break;
 	case dim_code:
 		newBrightness = brightness - step_bright;
@@ -121,7 +134,10 @@ void receive_ir_code(uint32_t code) {
 		i_frame--;
 		break;
 	case R_code:
-		scroll_disp_str("Kalina");
+		frame_ms -= 100;
+		break;
+	case B_code:
+		frame_ms += 100;
 		break;
 	case G_code:
 		bounce = !bounce;
@@ -181,33 +197,44 @@ void disp_str(String str, int offset) {
 	}
 }
 
-int scroll_offset = 0;
-int scroll_distance = 0;
-String scroll_string = "";
-int scroll_width = 0;
-int scroll_dir = 1;
-bool bounce = false;
+
 
 void set_scroll_disp_str(String str) {
 	// Start at right
 	scroll_string = str;
 	scroll_width = str.length() * CHAR_WIDTH;
-	scroll_offset = scroll_dir > 0 ? PIXELS_WIDTH : - scroll_width;
+	scroll_offset = scroll_dir > 0 ? -scroll_width : PIXELS_WIDTH;
 	// scroll_distance = PIXELS_WIDTH - str.length() * CHAR_WIDTH;
 }
 
 void scroll_disp_str(String str) {
 	if (scroll_string != str) set_scroll_disp_str(str);
 	disp_str(scroll_string, scroll_offset);
-	scroll_offset -= scroll_dir;
+	scroll_offset += scroll_dir;
 
-	if (scroll_dir > 0 && scroll_offset + scroll_width < 0) {
-		scroll_offset = PIXELS_WIDTH;
-		if (bounce) scroll_dir = !scroll_dir;
+	bool str_end_out_right = scroll_offset + scroll_width > PIXELS_WIDTH;
+	bool str_at_right_edge = scroll_offset + scroll_width >= PIXELS_WIDTH;
+	bool str_out_right = scroll_offset >= PIXELS_WIDTH;
+
+	bool str_start_out_left = scroll_offset < 0;
+	bool str_at_left_edge = scroll_offset < 0;
+	bool str_out_left = scroll_offset + scroll_width < 0;
+
+	bool scroll_left = scroll_dir < 0;
+	bool scroll_right = scroll_dir > 0;
+
+	if (bounce && bounce_at_str_start && (scroll_left && str_at_left_edge || scroll_right && str_at_right_edge)){
+		scroll_dir = -scroll_dir;
+		return;
 	}
-	else if (scroll_dir < 0 && scroll_offset > PIXELS_WIDTH) {
-		scroll_offset = -scroll_width;
-		if (bounce) scroll_dir = !scroll_dir;
+
+	if (scroll_left && str_out_left) {
+		if (bounce) scroll_dir = -scroll_dir;
+		else scroll_offset = PIXELS_WIDTH;
+	}
+	else if (scroll_right && str_out_right) {
+		if (bounce) scroll_dir = -scroll_dir;
+		else scroll_offset = -scroll_width;
 	}
 }
 
