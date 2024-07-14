@@ -23,6 +23,8 @@
 #define CHAR_WIDTH 5
 #define MAX_CHARS PIXELS_WIDTH / CHAR_WIDTH
 
+byte dead_pixels[] = {174};
+
 
 Adafruit_NeoPixel ws2812b(NUM_PIXELS, PIN_WS2812B, NEO_GRB + NEO_KHZ800);
 
@@ -39,7 +41,7 @@ void disp_str(String str, int offset);
 void receive_ir_code(uint32_t code);
 void set_scroll_disp_str(String str);
 void scroll_disp_str(String str);
-void display_frame(uint32_t frame, int len);
+void display_frame(uint32_t* frame, int len);
 
 bool is_on = true;
 uint8_t brightness = 1;
@@ -59,6 +61,8 @@ int scroll_width = 0;
 int scroll_dir = 1;
 bool bounce = true;
 bool bounce_at_str_start = true;
+
+byte pixel_lim = 0;
 
 void setup() {
 	Serial.begin(115200);
@@ -86,14 +90,15 @@ void loop() {
 	// for (int pixel = 0; pixel < NUM_PIXELS && pixel < frame_len; pixel++) {         // for each pixel
 	// 	ws2812b.setPixelColor(pixel, frame[pixel]);  // it only takes effect if pixels.show() is called
 
-	display_frame(neo_color, neo_color_size);
 	
 	// 	// delay(5);  // 500ms pause between each pixel
 	// }
 	if (millis() > last_frame + frame_ms){
 		last_frame = millis();
-		scroll_disp_str("Kalina");
+		display_frame(neo_color, neo_color_size);
+		scroll_disp_str("Kalina!");
 		Serial.printf("Scroll offset: %d\nScroll dir: %d\n",scroll_offset, scroll_dir);
+		pixel_lim++;
 	} 
 
 	// if (i_frame > PIXELS_WIDTH) i_frame = - 6 * CHAR_WIDTH;
@@ -102,8 +107,11 @@ void loop() {
 	// 	disp_str("Kalina", i_frame);
 	// else 
 	
+	for (int i = 0; i < pixel_lim; i++){
+		ws2812b.setPixelColor(i,0x00000000);
+	}
+
 	ws2812b.show();                                          // update to the WS2812B Led Strip
-	return;
 }
 
 
@@ -170,8 +178,10 @@ void display_char(int x_pos, char c) {
 		for (int px = x_start; px < NUM_PIXELS && frame_idx < frame_px_len; px++) {
 			// Serial.printf("px %d, fidx %d\n",px,frame_idx);
 			if (px >= 0) {
-				uint32_t col = ws2812b.Color(brightness * disp_frame[frame_idx], brightness * disp_frame[frame_idx], brightness * disp_frame[frame_idx]);
-				ws2812b.setPixelColor(px, col);
+				if (disp_frame[frame_idx] != 0){
+					uint32_t col = ws2812b.Color(brightness * disp_frame[frame_idx], brightness * disp_frame[frame_idx], brightness * disp_frame[frame_idx]);
+					ws2812b.setPixelColor(px, col);
+				}
 			}
 			if (frame_idx % PIXELS_HEIGHT == 0)
 				frame_idx += 2 * PIXELS_HEIGHT;
@@ -181,8 +191,10 @@ void display_char(int x_pos, char c) {
 		int frame_idx = 0;
 		for (int px = x_start; px < NUM_PIXELS && frame_idx < frame_px_len; px++) {
 			if (px >= 0) {
-				uint32_t col = ws2812b.Color(brightness * disp_frame[frame_idx], brightness * disp_frame[frame_idx], brightness * disp_frame[frame_idx]);
-				ws2812b.setPixelColor(px, col);
+				if (disp_frame[frame_idx] != 0){
+					uint32_t col = ws2812b.Color(brightness * disp_frame[frame_idx], brightness * disp_frame[frame_idx], brightness * disp_frame[frame_idx]);
+					ws2812b.setPixelColor(px, col);
+				}
 			}
 			frame_idx++;
 		}

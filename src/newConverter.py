@@ -89,54 +89,54 @@ def pixel_to_color_data(pix, out_name):
 
 
 
+def image_to_c_data():
+    for file in os.listdir(img_dir):
+        if file.endswith(".png"):
+            img_paths.append(os.path.join(img_dir, file))
 
-for file in os.listdir(img_dir):
-    if file.endswith(".png"):
-        img_paths.append(os.path.join(img_dir, file))
+    for img_path in img_paths:
+        imgs.append(Image.open(img_path))
 
-for img_path in img_paths:
-    imgs.append(Image.open(img_path))
+    # print("found images:",img_paths)
+    img_tup : tuple[Image.Image,str] = zip(imgs,img_paths)
 
-# print("found images:",img_paths)
-img_tup : tuple[Image.Image,str] = zip(imgs,img_paths)
+    with open(out_file,"wt") as out:
+        out.write("#ifndef byte\n#include <Arduino.h>\n#endif\n\n")
 
-with open(out_file,"wt") as out:
-    out.write("#ifndef byte\n#include <Arduino.h>\n#endif\n\n")
+    with open(out_file_color,"wt") as out:
+        out.write("#ifndef byte\n#include <Arduino.h>\n#endif\n\n")
 
-with open(out_file_color,"wt") as out:
-    out.write("#ifndef byte\n#include <Arduino.h>\n#endif\n\n")
+    for img, img_path in img_tup:
+        symbol_name = Path(img_path).stem
+        
+        img : Image.Image = img.convert("RGB")
+        pix = img.load()
+        print(img_path,img.size)
+        
+        # Data output
+        lines = pixel_to_data(pix, symbol_name)
+        lines += f"size_t {symbol_name}_size = sizeof({symbol_name}) / sizeof({symbol_name}[0]);\n"
+        lines += "\n"
 
-for img, img_path in img_tup:
-    symbol_name = Path(img_path).stem
-    
-    img : Image.Image = img.convert("RGB")
-    pix = img.load()
-    print(img_path,img.size)
-    
-    # Data output
-    lines = pixel_to_data(pix, symbol_name)
-    lines += f"size_t {symbol_name}_size = sizeof({symbol_name}) / sizeof({symbol_name}[0]);\n"
-    lines += "\n"
+        with open(out_file,"at") as out:
+            out.write(lines)
 
-    with open(out_file,"at") as out:
-        out.write(lines)
+        symbol_name = symbol_name+"_color"
+        # Color Data output
+        lines = pixel_to_color_data(pix, symbol_name)
+        lines += f"size_t {symbol_name}_size = sizeof({symbol_name}) / sizeof({symbol_name}[0]);\n"
+        lines += "\n"
 
-    symbol_name = symbol_name+"_color"
-    # Color Data output
-    lines = pixel_to_color_data(pix, symbol_name)
-    lines += f"size_t {symbol_name}_size = sizeof({symbol_name}) / sizeof({symbol_name}[0]);\n"
-    lines += "\n"
+        with open(out_file_color,"at") as out:
+            out.write(lines)
 
-    with open(out_file_color,"at") as out:
-        out.write(lines)
-
-    
-    img.close()
+        
+        img.close()
 
 
 
 
 if __name__ == "__main__":
-    for i in range(-20,0):
-        print(idx_to_pos(i,5))
+    # for i in range(-20,0):
+    print(pos_to_idx(32-11,1))
 
