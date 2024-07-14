@@ -39,6 +39,7 @@ void disp_str(String str, int offset);
 void receive_ir_code(uint32_t code);
 void set_scroll_disp_str(String str);
 void scroll_disp_str(String str);
+void display_frame(uint32_t frame, int len);
 
 bool is_on = true;
 uint8_t brightness = 1;
@@ -85,6 +86,8 @@ void loop() {
 	// for (int pixel = 0; pixel < NUM_PIXELS && pixel < frame_len; pixel++) {         // for each pixel
 	// 	ws2812b.setPixelColor(pixel, frame[pixel]);  // it only takes effect if pixels.show() is called
 
+	display_frame(neo_color, neo_color_size);
+	
 	// 	// delay(5);  // 500ms pause between each pixel
 	// }
 	if (millis() > last_frame + frame_ms){
@@ -134,7 +137,7 @@ void receive_ir_code(uint32_t code) {
 		i_frame--;
 		break;
 	case R_code:
-		frame_ms -= 100;
+		frame_ms -= 10;
 		break;
 	case B_code:
 		frame_ms += 100;
@@ -149,7 +152,6 @@ void receive_ir_code(uint32_t code) {
 }
 
 void display_char(int x_pos, char c) {
-
 	byte* disp_frame = char_to_led_data(c);
 	int frame_px_len = sizeof(A) / sizeof(A[0]); // Assume Every Char has the Same Size
 	int frame_width = frame_px_len / PIXELS_HEIGHT;
@@ -162,8 +164,6 @@ void display_char(int x_pos, char c) {
 
 	// If x_pos < 0, or x_pos > x_len - frame_width
 
-
-	
 	if (x_pos % 2) {
 		// Serial.printf("\nungerade,%d %d\n\n",x_start, x_pos);
 		int frame_idx = PIXELS_HEIGHT -1;
@@ -196,8 +196,6 @@ void disp_str(String str, int offset) {
 		display_char(i * CHAR_WIDTH + offset, str[i]);
 	}
 }
-
-
 
 void set_scroll_disp_str(String str) {
 	// Start at right
@@ -239,3 +237,17 @@ void scroll_disp_str(String str) {
 }
 
 
+void display_frame(uint32_t* frame, int len) {
+	float brightness_scale = ((float)brightness) / 255;
+	for (int i = 0; i < NUM_PIXELS && i < len; i++) {
+		float r = (float) (frame[i] & 0x00FF0000);
+		float g = (float) (frame[i] & 0x0000FF00);
+		float b = (float) (frame[i] & 0x000000FF);
+		r = r * brightness_scale;
+		g = g * brightness_scale;
+		b = b * brightness_scale;
+		uint32_t color = 0x00000000 || (((uint32_t)r) << 16) || (((uint32_t)g) << 8) || ((uint32_t)b);
+		ws2812b.setPixelColor(i, color);
+	}
+		
+}

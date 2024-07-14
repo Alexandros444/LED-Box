@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #endif
 
-#ifndef A_size
+#ifndef A
 #include "led_matrix_data.h"
 #endif
 
@@ -164,6 +164,9 @@ byte* char_to_led_data(char c) {
 		break;
 	case 'z':
 		ret=Z;
+		break;
+	case '!':
+		ret=ex_mark;
 		break;
 	default:
 		break;
