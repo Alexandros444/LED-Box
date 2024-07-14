@@ -46,7 +46,7 @@ uint8_t step_bright = 1;
 uint32_t last_ir_code = 0;
 int ir_inc_dec = 1;
 
-unsigned int frame_ms = 100;
+unsigned int frame_ms = 1000;
 long last_frame = 0;
 
 void setup() {
@@ -82,8 +82,10 @@ void loop() {
 		i_frame++;
 	} 
 	if (i_frame > PIXELS_WIDTH) i_frame = - 6 * CHAR_WIDTH;
-	if (is_on) disp_str("Kalina", i_frame);
-	else ws2812b.clear();
+	if (!is_on)
+		ws2812b.clear();
+	// 	disp_str("Kalina", i_frame);
+	// else 
 	
 	ws2812b.show();                                          // update to the WS2812B Led Strip
 	return;
@@ -118,6 +120,11 @@ void receive_ir_code(uint32_t code) {
 	case Orange2_code:
 		i_frame--;
 		break;
+	case R_code:
+		scroll_disp_str("Kalina");
+		break;
+	case G_code:
+		bounce = !bounce;
 	default:
 		// Serial.print("Cant find Code: ");
 		// Serial.println(code, HEX);
@@ -178,18 +185,30 @@ int scroll_offset = 0;
 int scroll_distance = 0;
 String scroll_string = "";
 int scroll_width = 0;
-void set_scroll_disp_str(String str){
+int scroll_dir = 1;
+bool bounce = false;
+
+void set_scroll_disp_str(String str) {
 	// Start at right
-	scroll_offset = PIXELS_WIDTH;
 	scroll_string = str;
 	scroll_width = str.length() * CHAR_WIDTH;
+	scroll_offset = scroll_dir > 0 ? PIXELS_WIDTH : - scroll_width;
 	// scroll_distance = PIXELS_WIDTH - str.length() * CHAR_WIDTH;
 }
 
-void scroll_disp_str(void){
-	disp_str(scroll_string,scroll_offset);
-	scroll_offset--;
-	if (scroll_offset + scroll_width < 0){
+void scroll_disp_str(String str) {
+	if (scroll_string != str) set_scroll_disp_str(str);
+	disp_str(scroll_string, scroll_offset);
+	scroll_offset -= scroll_dir;
+
+	if (scroll_dir > 0 && scroll_offset + scroll_width < 0) {
 		scroll_offset = PIXELS_WIDTH;
+		if (bounce) scroll_dir = !scroll_dir;
+	}
+	else if (scroll_dir < 0 && scroll_offset > PIXELS_WIDTH) {
+		scroll_offset = -scroll_width;
+		if (bounce) scroll_dir = !scroll_dir;
 	}
 }
+
+
