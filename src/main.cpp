@@ -56,8 +56,8 @@ int i_frame = 0;
 bool is_i_run = false;
 
 byte cells[PIXELS_WIDTH][PIXELS_HEIGHT] = { 0 };
-byte survival_rule[] = {1,2,3,4,5,6};
-byte birth_rule[] = {1};
+byte survival_rule[] = {2,3};
+byte birth_rule[] = {3,4};
 
 int pos_to_idx(int x, int y) {
     int n_row = x * PIXELS_HEIGHT;
@@ -85,11 +85,11 @@ byte safe_cell_lookup(int x, int y) {
 	return cells[x][y];
 }
 
-void disp_cells(void) {
+void disp_cells(byte r, byte g, byte b) {
 	for (int x = 0; x < PIXELS_WIDTH; x++) {
 		for (int y = 0; y < PIXELS_HEIGHT; y++) {
 			byte idx = pos_to_idx(x, y);
-			ws2812b.setPixelColor(idx, ws2812b.Color(brightness * cells[x][y], brightness * cells[x][y], brightness * cells[x][y]));
+			ws2812b.setPixelColor(idx, ws2812b.Color(brightness * cells[x][y] * r, brightness * cells[x][y] * g, brightness * cells[x][y] * b));
 		}
 	}
 }
@@ -179,7 +179,7 @@ void receive_ir_code(uint32_t code) {
 		else brightness = newBrightness;
 		Serial.print(brightness);
 		break;
-	case Teal2_code:
+	case Flash_code:
 		is_i_run = !is_i_run;
 		break;
 	case Orange_code:
@@ -197,12 +197,18 @@ void receive_ir_code(uint32_t code) {
 	case G_code:
 		bounce = !bounce;
 		break;
-	case Flash_code:
-		run_cells_step();
-		break;
 	case Strobe_code:
-		random_splash(10);
+		random_splash(30);
 		break;
+	case Fade_code:
+		for (int x = 0; x < PIXELS_WIDTH; x++){
+			for (int y = 0; y < PIXELS_HEIGHT; y++){
+				cells[x][y] = 0;
+			}
+			
+		}
+		break;
+		
 	default:
 		// Serial.print("Cant find Code: ");
 		// Serial.println(code, HEX);
@@ -284,6 +290,12 @@ void scroll_disp_str(String str, bool remove_background) {
 	bool scroll_left = scroll_dir < 0;
 	bool scroll_right = scroll_dir > 0;
 
+	if (scroll_width > PIXELS_WIDTH){
+		str_at_right_edge = scroll_offset >= 0;
+		str_at_left_edge = scroll_offset + scroll_width <= PIXELS_WIDTH;
+	}
+
+
 	if (bounce && bounce_at_str_start && (scroll_left && str_at_left_edge || scroll_right && str_at_right_edge)){
 		scroll_dir = -scroll_dir;
 		return;
@@ -330,7 +342,7 @@ void setup() {
 	ws2812b.begin();  // initialize WS2812B strip object (REQUIRED)
 	// ws2812b.setBrightness(50);
 
-	random_splash(20);
+	random_splash(50);
 }
 
 void loop() {
@@ -353,14 +365,21 @@ void loop() {
 	
 	// 	// delay(5);  // 500ms pause between each pixel
 	// }
+
 	if (millis() > last_frame + frame_ms){
 		last_frame = millis();
+		disp_cells(1,0,0);
+		
+		if (is_i_run)
+		{
+			run_cells_step();
+		}
+		
 
-		disp_cells();
 
 
 		// display_frame(neo_color, neo_color_size);
-// scroll_disp_str("Kalina!", false);
+		scroll_disp_str("Kalina!", false);
 		Serial.printf("Scroll offset: %d\nScroll dir: %d\n",scroll_offset, scroll_dir);
 		// pixel_lim++;
 	} 
