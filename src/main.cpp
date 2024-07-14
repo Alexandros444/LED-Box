@@ -36,11 +36,11 @@ size_t frame_sizes[] = { test_color_size, black_color_size, white_color_size, I_
 int i_frame = 0;
 bool is_i_run = false;
 
-void display_char(int x_pos, char c);
-void disp_str(String str, int offset);
+void display_char(int x_pos, char c, bool removeBackground);
+void disp_str(String str, int offset, bool remove_background);
 void receive_ir_code(uint32_t code);
 void set_scroll_disp_str(String str);
-void scroll_disp_str(String str);
+void scroll_disp_str(String str, bool remove_background);
 void display_frame(uint32_t* frame, int len);
 
 bool is_on = true;
@@ -96,7 +96,7 @@ void loop() {
 	if (millis() > last_frame + frame_ms){
 		last_frame = millis();
 		display_frame(neo_color, neo_color_size);
-		scroll_disp_str("Kalina!");
+		scroll_disp_str("Kalina!", false);
 		Serial.printf("Scroll offset: %d\nScroll dir: %d\n",scroll_offset, scroll_dir);
 		pixel_lim++;
 	} 
@@ -107,9 +107,10 @@ void loop() {
 	// 	disp_str("Kalina", i_frame);
 	// else 
 	
-	for (int i = 0; i < pixel_lim; i++){
-		ws2812b.setPixelColor(i,0x00000000);
-	}
+	// GOOD EFFEKT
+	// for (int i = 0; i < pixel_lim; i++){
+	// 	ws2812b.setPixelColor(i,0x00000000);
+	// }
 
 	ws2812b.show();                                          // update to the WS2812B Led Strip
 }
@@ -159,7 +160,7 @@ void receive_ir_code(uint32_t code) {
 	}
 }
 
-void display_char(int x_pos, char c) {
+void display_char(int x_pos, char c, bool removeBackground) {
 	byte* disp_frame = char_to_led_data(c);
 	int frame_px_len = sizeof(A) / sizeof(A[0]); // Assume Every Char has the Same Size
 	int frame_width = frame_px_len / PIXELS_HEIGHT;
@@ -178,7 +179,7 @@ void display_char(int x_pos, char c) {
 		for (int px = x_start; px < NUM_PIXELS && frame_idx < frame_px_len; px++) {
 			// Serial.printf("px %d, fidx %d\n",px,frame_idx);
 			if (px >= 0) {
-				if (disp_frame[frame_idx] != 0){
+				if (disp_frame[frame_idx] != 0 || removeBackground){
 					uint32_t col = ws2812b.Color(brightness * disp_frame[frame_idx], brightness * disp_frame[frame_idx], brightness * disp_frame[frame_idx]);
 					ws2812b.setPixelColor(px, col);
 				}
@@ -191,7 +192,7 @@ void display_char(int x_pos, char c) {
 		int frame_idx = 0;
 		for (int px = x_start; px < NUM_PIXELS && frame_idx < frame_px_len; px++) {
 			if (px >= 0) {
-				if (disp_frame[frame_idx] != 0){
+				if (disp_frame[frame_idx] != 0 || removeBackground){
 					uint32_t col = ws2812b.Color(brightness * disp_frame[frame_idx], brightness * disp_frame[frame_idx], brightness * disp_frame[frame_idx]);
 					ws2812b.setPixelColor(px, col);
 				}
@@ -203,9 +204,9 @@ void display_char(int x_pos, char c) {
 
 }
 
-void disp_str(String str, int offset) {
+void disp_str(String str, int offset, bool remove_background) {
 	for (int i = 0; i < str.length(); i++) {
-		display_char(i * CHAR_WIDTH + offset, str[i]);
+		display_char(i * CHAR_WIDTH + offset, str[i], remove_background);
 	}
 }
 
@@ -217,9 +218,9 @@ void set_scroll_disp_str(String str) {
 	// scroll_distance = PIXELS_WIDTH - str.length() * CHAR_WIDTH;
 }
 
-void scroll_disp_str(String str) {
+void scroll_disp_str(String str, bool remove_background) {
 	if (scroll_string != str) set_scroll_disp_str(str);
-	disp_str(scroll_string, scroll_offset);
+	disp_str(scroll_string, scroll_offset, remove_background);
 	scroll_offset += scroll_dir;
 
 	bool str_end_out_right = scroll_offset + scroll_width > PIXELS_WIDTH;
@@ -250,16 +251,15 @@ void scroll_disp_str(String str) {
 
 
 void display_frame(uint32_t* frame, int len) {
-	float brightness_scale = ((float)brightness) / 255;
+	// float brightness_scale = ((float)brightness) / 255;
 	for (int i = 0; i < NUM_PIXELS && i < len; i++) {
-		float r = (float) (frame[i] & 0x00FF0000);
-		float g = (float) (frame[i] & 0x0000FF00);
-		float b = (float) (frame[i] & 0x000000FF);
-		r = r * brightness_scale;
-		g = g * brightness_scale;
-		b = b * brightness_scale;
-		uint32_t color = 0x00000000 || (((uint32_t)r) << 16) || (((uint32_t)g) << 8) || ((uint32_t)b);
+		uint8_t r = (frame[i] & 0x00FF0000) >> 16;
+		uint8_t g = (frame[i] & 0x0000FF00) >> 8;
+		uint8_t b = frame[i] & 0x000000FF;
+		r = r * brightness / 255;
+		g = g * brightness / 255;
+		b = b * brightness / 255;
+		uint32_t color = 0x00000000 | (r << 16) | (g << 8) | b;
 		ws2812b.setPixelColor(i, color);
 	}
-		
 }

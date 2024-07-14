@@ -14,6 +14,10 @@
 - ggf. Farbframes uint8_t[8x32x3] RGB Frames
 - Helligkeit und Farbe anpassbar machen von BW Frames
 - Background verändern
+- Effekte 
+- Changing background
+- Cellular Automata
+- Acid, Tropfen etc 
 - Effekte
 
 
