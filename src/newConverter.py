@@ -59,9 +59,9 @@ def pos_to_idx(x,y, y_len=8):
     return n
 
 
-def pixel_to_data(pix, out_name):
+def pixel_to_data(pix, out_name, n_pix):
     lines = f"byte {out_name}[] = " + "{\n"
-    for i in range(0, img.width*img.height):
+    for i in range(0, n_pix):
         px,py = idx_to_pos(i)
         if i % 8 == 0 and i != 0:
             lines += "\n"
@@ -73,12 +73,12 @@ def pixel_to_data(pix, out_name):
 
 
 
-def pixel_to_color_data(pix, out_name):
+def pixel_to_color_data(pix, out_name, n_pix):
     """
     32 Bit, WRGB each 8-Bit in this order MSB White, LSB Blue
     """
     lines = f"uint32_t {out_name}[] = " + "{\n"
-    for i in range(0, img.width*img.height):
+    for i in range(0, n_pix):
         px,py = idx_to_pos(i)
         if i % 8 == 0 and i != 0:
             lines += "\n"
@@ -114,7 +114,7 @@ def image_to_c_data():
         print(img_path,img.size)
         
         # Data output
-        lines = pixel_to_data(pix, symbol_name)
+        lines = pixel_to_data(pix, symbol_name, img.width*img.height)
         lines += f"size_t {symbol_name}_size = sizeof({symbol_name}) / sizeof({symbol_name}[0]);\n"
         lines += "\n"
 
@@ -123,7 +123,7 @@ def image_to_c_data():
 
         symbol_name = symbol_name+"_color"
         # Color Data output
-        lines = pixel_to_color_data(pix, symbol_name)
+        lines = pixel_to_color_data(pix, symbol_name, img.width*img.height)
         lines += f"size_t {symbol_name}_size = sizeof({symbol_name}) / sizeof({symbol_name}[0]);\n"
         lines += "\n"
 
