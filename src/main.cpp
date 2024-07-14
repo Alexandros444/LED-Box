@@ -8,7 +8,8 @@
 
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
-// #include "led_matrix_data.h"
+ // #include "led_matrix_data.h"
+#include "ir_codes.h"
 #include "led_matrix_color_data.h"
 #include "table.h"
 #include <IRremoteESP8266.h>
@@ -28,10 +29,11 @@ IRrecv irrecv(RECV_PIN);
 
 decode_results results;
 
-
 uint32_t* frames[] = { test_color, black_color, white_color, I_color, K_color, A_color };
 size_t frame_sizes[] = { test_color_size, black_color_size, white_color_size, I_color_size, K_color_size, A_color_size };
 int i_frame = 0;
+
+void display_char(int x_pos, char c);
 
 void setup() {
 	Serial.begin(115200);
@@ -41,6 +43,7 @@ void setup() {
 	ws2812b.begin();  // initialize WS2812B strip object (REQUIRED)
 	ws2812b.setBrightness(50);
 }
+
 
 void loop() {
 
