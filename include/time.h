@@ -1,9 +1,9 @@
-#ifndef TIME_H
-#define TIME_H
+#ifndef _TIME_H
+#define _TIME_H
 
-unsigned long frame_ms = 32;
-unsigned long sim_ms = 100;
-unsigned long last_frame = 0;
-unsigned long last_sim = 0;
+#include <Arduino.h>
+bool is_new_frame_time();
+bool is_new_sim_time();
+void set_sim_ms(unsigned long ms);
 
 #endif

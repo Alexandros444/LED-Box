@@ -1,68 +1,59 @@
 #include "ir.h"
 
+IRrecv irrecv(RECV_PIN);
+decode_results results;
+
+void ir_begin() {
+	irrecv.enableIRIn(); 
+}
+
+void ir_receive() {
+	if (irrecv.decode(&results)) {
+		Serial.println(results.value, HEX);
+		irrecv.resume(); // Receive the next value
+		receive_ir_code(results.value);
+	}
+}
+
 void receive_ir_code(uint32_t code) {
 	uint8_t newBrightness;
 	switch (code){
 	case Off_code:
-		is_on = false;
+		turn_disp_off();
 		break;
 	case On_code:
-		is_on = true;
+		turn_disp_on();
 		break;
 	case bright_code:
-		brightness += step_bright;
-		if (brightness > max_bright)brightness = max_bright;
-		if (brightness < 100) step_bright = 25;
-		if (brightness < 40) step_bright = 5;
-		if (brightness < 10) step_bright = 1;
-		Serial.print(brightness);
+		inc_brightness();
 		break;
 	case dim_code:
-		newBrightness = brightness - step_bright;
-		if (brightness < newBrightness) brightness = 0;
-		else brightness = newBrightness;
-		if (brightness < 100) step_bright = 25;
-		if (brightness < 40) step_bright = 5;
-		if (brightness < 10) step_bright = 1;
-		Serial.print(brightness);
+		dec_brightness();
 		break;
 	case Flash_code:
-		is_i_run = !is_i_run;
+		toggle_frames();
 		break;
 	case R_code:
-		sim_ms /= 2;
+		inc_game_speed();
 		break;
 	case B_code:
-		sim_ms = sim_ms * 2 + 1;
+		dec_game_speed();
 		break;
 	case G_code:
-		bounce = !bounce;
+		toggle_bounce();
 		break;
 	case Green_code:
-		if (sgame.game_started) {
-			snake.dir = UP;
-			sgame.last_input_time = millis();
-		}
+		steer_snake(UP);
 		break;
 	case Purple_code:
-		if (sgame.game_started){
-			snake.dir = RIGHT;
-			sgame.last_input_time = millis();
-		}
+		steer_snake(RIGHT);
 		break;
 	case Teal2_code:
-		if (sgame.game_started){
-			snake.dir = DOWN;
-			sgame.last_input_time = millis();
-		}
+		steer_snake(DOWN);
 		break;
 	case Orange2_code:
-		if (sgame.game_started){
-			snake.dir = LEFT;
-			sgame.last_input_time = millis();
-		}
+		steer_snake(LEFT);
 		break;
-
 	case Strobe_code:
 		random_splash(30);
 		break;

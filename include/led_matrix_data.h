@@ -1,8 +1,7 @@
-#ifndef LED_MATRIX_DATA_H
-#define LED_MATRIX_DATA_H
 #include <Arduino.h>
+#pragma once
 
-byte A[] = {
+byte A[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 1, 1, 1, 1, 1, 0, 0, 
 0, 1, 0, 0, 1, 0, 0, 0, 
@@ -12,7 +11,7 @@ byte A[] = {
 
 size_t A_size = sizeof(A) / sizeof(A[0]);
 
-byte acid[] = {
+byte acid[256] = {
 1, 1, 1, 1, 1, 1, 1, 1, 
 1, 1, 1, 1, 1, 1, 1, 1, 
 1, 1, 1, 1, 1, 1, 1, 1, 
@@ -48,7 +47,7 @@ byte acid[] = {
 
 size_t acid_size = sizeof(acid) / sizeof(acid[0]);
 
-byte B[] = {
+byte B[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 1, 1, 1, 1, 1, 1, 0, 
 0, 1, 0, 1, 0, 0, 1, 0, 
@@ -58,7 +57,7 @@ byte B[] = {
 
 size_t B_size = sizeof(B) / sizeof(B[0]);
 
-byte black[] = {
+byte black[256] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 0, 0, 0, 0, 0, 0, 0, 
@@ -94,7 +93,7 @@ byte black[] = {
 
 size_t black_size = sizeof(black) / sizeof(black[0]);
 
-byte C[] = {
+byte C[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 1, 1, 1, 1, 1, 1, 0, 
 0, 1, 0, 0, 0, 0, 1, 0, 
@@ -104,7 +103,7 @@ byte C[] = {
 
 size_t C_size = sizeof(C) / sizeof(C[0]);
 
-byte D[] = {
+byte D[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 1, 1, 1, 1, 1, 1, 0, 
 0, 1, 0, 0, 0, 0, 1, 0, 
@@ -114,7 +113,7 @@ byte D[] = {
 
 size_t D_size = sizeof(D) / sizeof(D[0]);
 
-byte dot[] = {
+byte dot[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 1, 0, 0, 0, 0, 0, 0, 
 0, 0, 0, 0, 0, 0, 0, 0, 
@@ -124,7 +123,7 @@ byte dot[] = {
 
 size_t dot_size = sizeof(dot) / sizeof(dot[0]);
 
-byte E[] = {
+byte E[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 1, 1, 1, 1, 1, 1, 0, 
 0, 1, 0, 1, 0, 0, 1, 0, 
@@ -134,7 +133,7 @@ byte E[] = {
 
 size_t E_size = sizeof(E) / sizeof(E[0]);
 
-byte ex_mark[] = {
+byte ex_mark[40] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 1, 1, 1, 1, 0, 1, 0, 
@@ -143,7 +142,7 @@ byte ex_mark[] = {
 
 size_t ex_mark_size = sizeof(ex_mark) / sizeof(ex_mark[0]);
 
-byte F[] = {
+byte F[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 1, 1, 1, 1, 1, 1, 0, 
 0, 1, 0, 1, 0, 0, 0, 0, 
@@ -153,7 +152,7 @@ byte F[] = {
 
 size_t F_size = sizeof(F) / sizeof(F[0]);
 
-byte frame_red_yellow[] = {
+byte frame_red_yellow[256] = {
 0, 1, 0, 1, 0, 1, 0, 1, 
 0, 0, 0, 0, 0, 0, 0, 1, 
 0, 0, 0, 0, 0, 0, 0, 1, 
@@ -189,7 +188,7 @@ byte frame_red_yellow[] = {
 
 size_t frame_red_yellow_size = sizeof(frame_red_yellow) / sizeof(frame_red_yellow[0]);
 
-byte frame_red_yellow2[] = {
+byte frame_red_yellow2[256] = {
 1, 0, 1, 0, 1, 0, 1, 0, 
 1, 0, 0, 0, 0, 0, 0, 0, 
 1, 0, 0, 0, 0, 0, 0, 0, 
@@ -225,7 +224,7 @@ byte frame_red_yellow2[] = {
 
 size_t frame_red_yellow2_size = sizeof(frame_red_yellow2) / sizeof(frame_red_yellow2[0]);
 
-byte G[] = {
+byte G[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 1, 1, 1, 1, 1, 1, 0, 
 0, 1, 0, 0, 0, 0, 1, 0, 
@@ -235,7 +234,7 @@ byte G[] = {
 
 size_t G_size = sizeof(G) / sizeof(G[0]);
 
-byte H[] = {
+byte H[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 1, 1, 1, 1, 1, 1, 0, 
 0, 0, 0, 1, 0, 0, 0, 0, 
@@ -245,7 +244,7 @@ byte H[] = {
 
 size_t H_size = sizeof(H) / sizeof(H[0]);
 
-byte heart[] = {
+byte heart[64] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 0, 0, 1, 1, 1, 0, 0, 
 0, 1, 0, 0, 0, 1, 0, 0, 
@@ -257,7 +256,7 @@ byte heart[] = {
 
 size_t heart_size = sizeof(heart) / sizeof(heart[0]);
 
-byte I[] = {
+byte I[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 1, 0, 0, 0, 0, 1, 0, 
 0, 1, 1, 1, 1, 1, 1, 0, 
@@ -267,7 +266,7 @@ byte I[] = {
 
 size_t I_size = sizeof(I) / sizeof(I[0]);
 
-byte J[] = {
+byte J[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 0, 1, 1, 0, 0, 0, 0, 
 0, 0, 0, 0, 0, 0, 1, 0, 
@@ -277,7 +276,7 @@ byte J[] = {
 
 size_t J_size = sizeof(J) / sizeof(J[0]);
 
-byte K[] = {
+byte K[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 1, 1, 1, 1, 1, 1, 0, 
 0, 0, 0, 1, 1, 0, 0, 0, 
@@ -287,7 +286,7 @@ byte K[] = {
 
 size_t K_size = sizeof(K) / sizeof(K[0]);
 
-byte L[] = {
+byte L[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 1, 1, 1, 1, 1, 1, 0, 
 0, 0, 0, 0, 0, 0, 1, 0, 
@@ -297,7 +296,7 @@ byte L[] = {
 
 size_t L_size = sizeof(L) / sizeof(L[0]);
 
-byte M[] = {
+byte M[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 1, 1, 1, 1, 1, 1, 0, 
 0, 0, 1, 0, 0, 0, 0, 0, 
@@ -307,7 +306,7 @@ byte M[] = {
 
 size_t M_size = sizeof(M) / sizeof(M[0]);
 
-byte N[] = {
+byte N[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 1, 1, 1, 1, 1, 1, 0, 
 0, 0, 1, 1, 0, 0, 0, 0, 
@@ -317,7 +316,7 @@ byte N[] = {
 
 size_t N_size = sizeof(N) / sizeof(N[0]);
 
-byte neo[] = {
+byte neo[256] = {
 1, 1, 1, 1, 1, 1, 1, 1, 
 1, 1, 1, 1, 1, 1, 1, 1, 
 1, 1, 1, 1, 1, 1, 1, 1, 
@@ -353,7 +352,7 @@ byte neo[] = {
 
 size_t neo_size = sizeof(neo) / sizeof(neo[0]);
 
-byte num0[] = {
+byte num0[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 1, 1, 1, 1, 1, 1, 0, 
 0, 1, 0, 0, 0, 0, 1, 0, 
@@ -363,7 +362,7 @@ byte num0[] = {
 
 size_t num0_size = sizeof(num0) / sizeof(num0[0]);
 
-byte num1[] = {
+byte num1[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 0, 0, 0, 0, 1, 0, 0, 
 0, 1, 1, 1, 1, 1, 1, 0, 
@@ -373,7 +372,7 @@ byte num1[] = {
 
 size_t num1_size = sizeof(num1) / sizeof(num1[0]);
 
-byte num2[] = {
+byte num2[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 1, 1, 1, 1, 0, 1, 0, 
 0, 1, 0, 1, 0, 0, 1, 0, 
@@ -383,7 +382,7 @@ byte num2[] = {
 
 size_t num2_size = sizeof(num2) / sizeof(num2[0]);
 
-byte num3[] = {
+byte num3[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 1, 0, 0, 1, 0, 1, 0, 
 0, 1, 0, 1, 0, 0, 1, 0, 
@@ -393,7 +392,7 @@ byte num3[] = {
 
 size_t num3_size = sizeof(num3) / sizeof(num3[0]);
 
-byte num4[] = {
+byte num4[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 0, 0, 0, 1, 1, 1, 0, 
 0, 0, 0, 1, 1, 1, 1, 0, 
@@ -403,7 +402,7 @@ byte num4[] = {
 
 size_t num4_size = sizeof(num4) / sizeof(num4[0]);
 
-byte num5[] = {
+byte num5[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 1, 0, 0, 1, 1, 1, 0, 
 0, 1, 0, 1, 0, 0, 1, 0, 
@@ -413,7 +412,7 @@ byte num5[] = {
 
 size_t num5_size = sizeof(num5) / sizeof(num5[0]);
 
-byte num6[] = {
+byte num6[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 1, 1, 1, 1, 1, 1, 0, 
 0, 1, 0, 0, 1, 0, 1, 0, 
@@ -423,7 +422,7 @@ byte num6[] = {
 
 size_t num6_size = sizeof(num6) / sizeof(num6[0]);
 
-byte num7[] = {
+byte num7[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 0, 0, 0, 0, 0, 1, 0, 
 0, 1, 0, 0, 1, 0, 0, 0, 
@@ -433,7 +432,7 @@ byte num7[] = {
 
 size_t num7_size = sizeof(num7) / sizeof(num7[0]);
 
-byte num8[] = {
+byte num8[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 1, 1, 1, 1, 1, 1, 0, 
 0, 1, 0, 0, 1, 0, 1, 0, 
@@ -443,7 +442,7 @@ byte num8[] = {
 
 size_t num8_size = sizeof(num8) / sizeof(num8[0]);
 
-byte num9[] = {
+byte num9[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 1, 0, 0, 1, 1, 1, 0, 
 0, 1, 0, 1, 0, 0, 1, 0, 
@@ -453,7 +452,7 @@ byte num9[] = {
 
 size_t num9_size = sizeof(num9) / sizeof(num9[0]);
 
-byte O[] = {
+byte O[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 1, 1, 1, 1, 1, 1, 0, 
 0, 1, 0, 0, 0, 0, 1, 0, 
@@ -463,7 +462,7 @@ byte O[] = {
 
 size_t O_size = sizeof(O) / sizeof(O[0]);
 
-byte P[] = {
+byte P[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 1, 1, 1, 1, 1, 1, 0, 
 0, 1, 0, 1, 0, 0, 0, 0, 
@@ -473,7 +472,7 @@ byte P[] = {
 
 size_t P_size = sizeof(P) / sizeof(P[0]);
 
-byte Q[] = {
+byte Q[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 0, 0, 0, 0, 1, 0, 0, 
 0, 1, 0, 1, 0, 0, 0, 0, 
@@ -483,7 +482,7 @@ byte Q[] = {
 
 size_t Q_size = sizeof(Q) / sizeof(Q[0]);
 
-byte R[] = {
+byte R[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 1, 1, 1, 1, 1, 1, 0, 
 0, 1, 0, 0, 1, 0, 0, 0, 
@@ -493,7 +492,7 @@ byte R[] = {
 
 size_t R_size = sizeof(R) / sizeof(R[0]);
 
-byte S[] = {
+byte S[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 1, 0, 1, 1, 1, 1, 0, 
 0, 1, 0, 0, 1, 0, 1, 0, 
@@ -503,7 +502,7 @@ byte S[] = {
 
 size_t S_size = sizeof(S) / sizeof(S[0]);
 
-byte space[] = {
+byte space[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 0, 0, 0, 0, 0, 0, 0, 
@@ -513,7 +512,7 @@ byte space[] = {
 
 size_t space_size = sizeof(space) / sizeof(space[0]);
 
-byte T[] = {
+byte T[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 0, 0, 0, 0, 0, 1, 0, 
 0, 1, 1, 1, 1, 1, 1, 0, 
@@ -523,7 +522,7 @@ byte T[] = {
 
 size_t T_size = sizeof(T) / sizeof(T[0]);
 
-byte test[] = {
+byte test[256] = {
 1, 0, 1, 0, 1, 0, 1, 0, 
 0, 0, 0, 0, 0, 0, 0, 0, 
 1, 0, 1, 0, 1, 0, 1, 0, 
@@ -559,7 +558,7 @@ byte test[] = {
 
 size_t test_size = sizeof(test) / sizeof(test[0]);
 
-byte U[] = {
+byte U[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 1, 1, 1, 1, 1, 1, 0, 
 0, 0, 0, 0, 0, 0, 1, 0, 
@@ -569,7 +568,7 @@ byte U[] = {
 
 size_t U_size = sizeof(U) / sizeof(U[0]);
 
-byte V[] = {
+byte V[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 0, 0, 1, 1, 1, 1, 0, 
 0, 0, 0, 0, 1, 1, 1, 0, 
@@ -579,7 +578,7 @@ byte V[] = {
 
 size_t V_size = sizeof(V) / sizeof(V[0]);
 
-byte W[] = {
+byte W[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 1, 1, 1, 1, 1, 1, 0, 
 0, 0, 0, 0, 0, 1, 0, 0, 
@@ -589,7 +588,7 @@ byte W[] = {
 
 size_t W_size = sizeof(W) / sizeof(W[0]);
 
-byte white[] = {
+byte white[256] = {
 1, 1, 1, 1, 1, 1, 1, 1, 
 1, 1, 1, 1, 1, 1, 1, 1, 
 1, 1, 1, 1, 1, 1, 1, 1, 
@@ -625,7 +624,7 @@ byte white[] = {
 
 size_t white_size = sizeof(white) / sizeof(white[0]);
 
-byte X[] = {
+byte X[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 1, 1, 0, 0, 1, 1, 0, 
 0, 0, 0, 1, 1, 0, 0, 0, 
@@ -635,7 +634,7 @@ byte X[] = {
 
 size_t X_size = sizeof(X) / sizeof(X[0]);
 
-byte Y[] = {
+byte Y[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 0, 0, 0, 0, 1, 1, 0, 
 0, 0, 0, 1, 1, 1, 1, 0, 
@@ -645,7 +644,7 @@ byte Y[] = {
 
 size_t Y_size = sizeof(Y) / sizeof(Y[0]);
 
-byte Z[] = {
+byte Z[48] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 1, 1, 0, 0, 0, 1, 0, 
 0, 1, 0, 0, 1, 0, 1, 0, 
@@ -655,4 +654,3 @@ byte Z[] = {
 
 size_t Z_size = sizeof(Z) / sizeof(Z[0]);
 
-#endif

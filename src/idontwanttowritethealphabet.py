@@ -24,10 +24,7 @@ import string
 #include "led_matrix_data.h"
 
 lines = ""
-lines += "#ifndef TABLE_H\n"
-lines += "#define TABLE_H\n"
-lines += "#include <Arduino.h>\n"
-lines += "#include \"led_matrix_data.h\"\n\n"
+lines += "#include \"table.h\"\n"
 
 lines += f"byte* char_to_led_data(char c) "+"{\n"
 lines += f"\tbyte* ret = A;\n"
@@ -46,7 +43,6 @@ lines += f"\tcase \'!\':\n\t\tret=ex_mark;\n\t\tbreak;\n"
 lines += f"\tcase \'.\':\n\t\tret=dot;\n\t\tbreak;\n"
 lines += f"\tcase \' \':\n\t\tret=space;\n\t\tbreak;\n"
 lines += f"\tdefault:\n\t\tbreak;\n\t"+"}\n\treturn ret;\n}\n"
-lines += "#endif"
 
-with open("include/table.h","wt") as out:
+with open("src/table.cpp","wt") as out:
     out.write(lines)

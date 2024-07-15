@@ -1,6 +1,26 @@
 #include "snake.h"
 
-void clear_cells(void){
+Snake_Game sgame;
+Snake snake;
+
+void inc_game_speed() {
+	sgame.sim_speed_ms /= 2;
+	set_sim_ms(sgame.sim_speed_ms);
+}
+
+void dec_game_speed() {
+	sgame.sim_speed_ms = sgame.sim_speed_ms * 2 + 1;
+	set_sim_ms(sgame.sim_speed_ms);
+}
+
+void steer_snake(int dir) {
+	if (!sgame.game_started)
+		return;
+	snake.dir = dir;
+	sgame.last_input_time = millis();
+}
+
+void clear_cells(void) {
 	for (int x = 0; x < PIXELS_WIDTH; x++){
 		for (int y = 0; y < PIXELS_HEIGHT; y++){
 			cells[x][y] = 0;
@@ -92,6 +112,7 @@ void init_snake_game(){
 	sgame.is_anim_playing = false;
 	sgame.game_started = true;
 	sgame.berrys = 0;
+	set_sim_ms(sgame.sim_speed_ms);
 }
 
 void step_snake(){
@@ -210,12 +231,12 @@ void step_snake_game() {
 void disp_snake_game(){
 
 	for (int x = 0; x < PIXELS_WIDTH; x++){
-		for (int y = 0; y < PIXELS_HEIGHT; y++){			 
-			byte n = pos_to_idx(x,y);
-			if(cells[x][y] == BERRY)
-				ws2812b.setPixelColor(n,ws2812b.Color(brightness, 0,0));
+		for (int y = 0; y < PIXELS_HEIGHT; y++) {
+			byte n = pos_to_idx(x, y);
+			if (cells[x][y] == BERRY)
+				led_set_data(n, 1, 0, 0);
 			else
-			 	ws2812b.setPixelColor(n,0x00);
+				led_set_data(n, 0, 0, 0);
 		}
 	}
 
@@ -223,8 +244,8 @@ void disp_snake_game(){
 	for (size_t i = 0; i < snake.len; i++){
 		// Serial.printf("(%d,%d),",snake.body[i].x,snake.body[i].y);
 		byte n = pos_to_idx(snake.body[i].x, snake.body[i].y);
-		if (i == 0) ws2812b.setPixelColor(n, ws2812b.Color(brightness, 0, brightness));
-		else ws2812b.setPixelColor(n, ws2812b.Color(0, brightness, 0));
+		if (i == 0) led_set_data(n, 1, 0, 1);
+		else led_set_data(n, 0, 1, 0);
 	}
 	// Serial.println();
 

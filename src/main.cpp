@@ -1,20 +1,17 @@
 #include <Arduino.h>
 
-#include "text.h"
-#include "snake.h"
 #include "ir.h"
-#include "cells.h"
 
 void setup() {
 	Serial.begin(115200);
 
-	irrecv.enableIRIn(); // Start the receiver
-
-	ws2812b.begin();  // initialize WS2812B strip object (REQUIRED)
+	// Start the receiver
+	ir_begin();
+	led_begin();  // initialize WS2812B strip object (REQUIRED)
 	// ws2812b.setBrightness(50);
 
-	random_splash(50);
-	ws2812b.clear();
+	// random_splash(50);
+	led_clear();
 }
 
 // unsigned long time_stamp1 = 0;
@@ -22,11 +19,7 @@ void setup() {
 
 void loop() {
 
-	if (irrecv.decode(&results)) {
-		Serial.println(results.value, HEX);
-		irrecv.resume(); // Receive the next value
-		receive_ir_code(results.value);
-	}
+	ir_receive();
 
 	// ws2812b.clear();  // set all pixel colors to 'off'. It only takes effect if pixels.show() is called
 
@@ -41,14 +34,12 @@ void loop() {
 	// 	// delay(5);  // 500ms pause between each pixel
 	// }
 
-	if (is_i_run && millis() > last_sim + sim_ms) {
-		last_sim = millis();
+	if (is_led_running() && is_new_frame_time()) {
 		step_snake_game();
 	}
 
 	
-	if (millis() > last_frame + frame_ms) {
-		last_frame = millis();
+	if (millis() > is_new_sim_time()) {
 		// disp_cells(1,0,0);
 		// test_pos_to_idx_etc();
 		// display_frame(acid_color, acid_color_size);
@@ -69,14 +60,9 @@ void loop() {
 	} 
 
 	// if (i_frame > PIXELS_WIDTH) i_frame = - 6 * CHAR_WIDTH;
-	if (!is_on)
-		ws2812b.clear();
 	// 	disp_str("Kalina", i_frame);
 	// else 
-	
-
-
-	ws2812b.show();                                          // update to the WS2812B Led Strip
+	led_show();                                     // update to the WS2812B Led Strip
 }
 
 

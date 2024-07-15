@@ -1,5 +1,8 @@
 #include "cells.h"
 
+byte survival_rule[] = {2,3};
+byte birth_rule[] = {3,4};
+
 byte safe_cell_lookup(int x, int y) {
 	if (x < 0 || y < 0 || x >= PIXELS_WIDTH || y >= PIXELS_HEIGHT) return 0;
 	return cells[x][y];
@@ -9,7 +12,7 @@ void disp_cells(byte r, byte g, byte b) {
 	for (int x = 0; x < PIXELS_WIDTH; x++) {
 		for (int y = 0; y < PIXELS_HEIGHT; y++) {
 			byte idx = pos_to_idx(x, y);
-			ws2812b.setPixelColor(idx, ws2812b.Color(brightness * cells[x][y] * r, brightness * cells[x][y] * g, brightness * cells[x][y] * b));
+			led_set_data(idx, cells[x][y] * r, cells[x][y] * g, cells[x][y] * b);
 		}
 	}
 } 

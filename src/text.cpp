@@ -1,5 +1,17 @@
 #include "text.h"
 
+int scroll_offset = 0;
+int scroll_distance = 0;
+String scroll_string = "";
+int scroll_width = 0;
+int scroll_dir = -1;
+bool bounce = true;
+bool bounce_at_str_start = true;
+
+void toggle_bounce() {
+	bounce = !bounce;
+}
+
 void display_char(int x_pos, char c, bool removeBackground) {
 	byte* disp_frame = char_to_led_data(c);
 	int frame_px_len = sizeof(A) / sizeof(A[0]); // Assume Every Char has the Same Size
@@ -21,8 +33,7 @@ void display_char(int x_pos, char c, bool removeBackground) {
 			if (px >= 0) {
 				if ((disp_frame[frame_idx] != 0) || removeBackground) {
 					Serial.printf("Frame idx:%d, data:%d, background:%d\n", frame_idx, disp_frame[frame_idx],removeBackground);
-					uint32_t col = ws2812b.Color(brightness * disp_frame[frame_idx], brightness * disp_frame[frame_idx], brightness * disp_frame[frame_idx]);
-					ws2812b.setPixelColor(px, col);
+					led_set_data(px, disp_frame[frame_idx], disp_frame[frame_idx], disp_frame[frame_idx]);
 				}
 			}
 			if (frame_idx % PIXELS_HEIGHT == 0)
@@ -35,8 +46,7 @@ void display_char(int x_pos, char c, bool removeBackground) {
 			if (px >= 0) {
 				if ((disp_frame[frame_idx] != 0) || removeBackground) {
 					Serial.printf("Frame idx:%d, data:%d, background:%d\n", frame_idx, disp_frame[frame_idx],removeBackground);
-					uint32_t col = ws2812b.Color(brightness * disp_frame[frame_idx], brightness * disp_frame[frame_idx], brightness * disp_frame[frame_idx]);
-					ws2812b.setPixelColor(px, col);
+					led_set_data(px, disp_frame[frame_idx], disp_frame[frame_idx], disp_frame[frame_idx]);
 				}
 			}
 			frame_idx++;

@@ -35,7 +35,7 @@ int test_y = 0;
 void test_pos_to_idx_etc(){
 
 	int n = pos_to_idx(test_x,test_y);
-	ws2812b.setPixelColor(n,ws2812b.Color(brightness,brightness,brightness));
+	led_set_data(n, 1, 1, 1);
 	test_y++;
 	if (test_y % PIXELS_HEIGHT == 0){
 		test_y = 0;
@@ -52,7 +52,7 @@ void test_idx_to_pos_etc(){
 	int x;
 	int y;
 	idx_to_pos(test_n, &x, &y);
-	ws2812b.setPixelColor(pos_to_idx(x, y), ws2812b.Color(brightness, brightness, brightness));
+	led_set_data(pos_to_idx(x, y), 1, 1, 1);
 	test_n++;
 }
 

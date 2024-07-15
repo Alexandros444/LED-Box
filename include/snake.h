@@ -17,6 +17,10 @@ int calc_auto_move_dir_from_pos(int x, int y);
 void do_auto_move();
 void step_snake_game();
 void disp_snake_game();
+void inc_game_speed();
+void dec_game_speed();
+void steer_snake(int dir);
+
 
 enum Direction {
 	UP,
@@ -53,8 +57,5 @@ struct Snake_Game{
     unsigned long inactivity_timer = 10000;
     unsigned long sim_speed_ms = 1000;
 };
-
-Snake_Game sgame;
-Snake snake;
 
 #endif

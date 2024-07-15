@@ -24,8 +24,10 @@ img_paths = []
 imgs = []
 
 img_dir = "img"
-out_file = "include/led_matrix_data.h"
-out_file_color = "include/led_matrix_color_data.h"
+out_file_data_cpp = "src/led_matrix_data.cpp"
+out_file_color_cpp = "src/led_matrix_color_data.cpp"
+out_file_data_h = "include/led_matrix_data.h"
+out_file_color_h = "include/led_matrix_color_data.h"
 
 
 def idx_to_pos(n, y_len = 8):
@@ -60,7 +62,7 @@ def pos_to_idx(x,y, y_len=8):
 
 
 def pixel_to_data(pix, out_name, n_pix):
-    lines = f"byte {out_name}[] = " + "{\n"
+    lines = f"byte {out_name}[{n_pix}] = " + "{\n"
     for i in range(0, n_pix):
         px,py = idx_to_pos(i)
         if i % 8 == 0 and i != 0:
@@ -77,7 +79,7 @@ def pixel_to_color_data(pix, out_name, n_pix):
     """
     32 Bit, WRGB each 8-Bit in this order MSB White, LSB Blue
     """
-    lines = f"uint32_t {out_name}[] = " + "{\n"
+    lines = f"uint32_t {out_name}[{n_pix}] = " + "{\n"
     for i in range(0, n_pix):
         px,py = idx_to_pos(i)
         if i % 8 == 0 and i != 0:
@@ -100,15 +102,20 @@ def image_to_c_data():
     # print("found images:",img_paths)
     img_tup : tuple[Image.Image,str] = zip(imgs,img_paths)
 
-    with open(out_file,"wt") as out:
-        out.write("#ifndef LED_MATRIX_DATA_H\n" \
-                  "#define LED_MATRIX_DATA_H\n" \
-                  "#include <Arduino.h>\n\n")
+    lines_data_cpp = ""
+    lines_data_h = ""
+    lines_color_cpp = ""
+    lines_color_h = ""
 
-    with open(out_file_color,"wt") as out:
-        out.write("#ifndef LED_MATRIX_COLOR_DATA_H\n" \
-                  "#define LED_MATRIX_COLOR_DATA_H\n" \
-                  "#include <Arduino.h>\n\n")
+    lines_data_h += "#ifndef LED_MATRIX_DATA_H\n" \
+                    "#define LED_MATRIX_DATA_H\n" \
+                    "#include <Arduino.h>\n\n"
+    lines_data_cpp += "#include \"led_matrix_data.h\"\n"
+
+    lines_color_h +="#ifndef LED_MATRIX_COLOR_DATA_H\n" \
+                    "#define LED_MATRIX_COLOR_DATA_H\n" \
+                    "#include <Arduino.h>\n\n"
+    lines_color_cpp += "#include \"led_matrix_color_data.h\"\n"    
 
     for img, img_path in img_tup:
         symbol_name = Path(img_path).stem
@@ -116,34 +123,36 @@ def image_to_c_data():
         img : Image.Image = img.convert("RGB")
         pix = img.load()
         print(img_path,img.size)
+        img_n_pix = img.width*img.height
         
         # Data output
-        lines = pixel_to_data(pix, symbol_name, img.width*img.height)
-        lines += f"size_t {symbol_name}_size = sizeof({symbol_name}) / sizeof({symbol_name}[0]);\n"
-        lines += "\n"
+        lines_data_cpp += pixel_to_data(pix, symbol_name, img.width*img.height)
+        lines_data_cpp += f"size_t {symbol_name}_size = sizeof({symbol_name}) / sizeof({symbol_name}[0]);\n\n"
 
-        with open(out_file,"at") as out:
-            out.write(lines)
+        lines_data_h += f"extern byte {symbol_name}[{img_n_pix}];\n"
+        lines_data_h += f"extern size_t {symbol_name}_size;\n"
 
         symbol_name = symbol_name+"_color"
         # Color Data output
-        lines = pixel_to_color_data(pix, symbol_name, img.width*img.height)
-        lines += f"size_t {symbol_name}_size = sizeof({symbol_name}) / sizeof({symbol_name}[0]);\n"
-        lines += "\n"
+        lines_color_cpp += pixel_to_color_data(pix, symbol_name, img.width*img.height)
+        lines_color_cpp += f"size_t {symbol_name}_size = sizeof({symbol_name}) / sizeof({symbol_name}[0]);\n\n"
 
-        with open(out_file_color,"at") as out:
-            out.write(lines)
+        lines_color_h += f"extern byte {symbol_name}[{img_n_pix}];\n"
+        lines_color_h += f"extern size_t {symbol_name}_size;\n"
 
-        
         img.close()
 
-    with open(out_file,"at") as out:
-        out.write("#endif")
+    lines_data_h += "#endif"
+    lines_color_h += "#endif"
 
-    with open(out_file_color,"at") as out:
-        out.write("#endif")
-
-
+    with open(out_file_data_h,"wt") as out:
+        out.write(lines_data_h)
+    with open(out_file_data_cpp,"wt") as out:
+        out.write(lines_data_cpp)
+    with open(out_file_color_h,"wt") as out:
+        out.write(lines_color_h)
+    with open(out_file_color_cpp,"wt") as out:
+        out.write(lines_color_cpp)
 
 
 if __name__ == "__main__":
