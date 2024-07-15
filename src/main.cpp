@@ -295,12 +295,12 @@ void step_snake(){
 		return;
 	}
 	
-	Serial.printf("Snake Body: ");
+	// Serial.printf("Snake Body: ");
 	for (int i = 0; i < snake.max_len-1; i++){
 		snake.body[i+1] = snake.body[i];
-		Serial.printf("(%d,%d)",snake.body[i].x,snake.body[i].y);
+		// Serial.printf("(%d,%d)",snake.body[i].x,snake.body[i].y);
 	}
-	Serial.println();
+	// Serial.println();
 	snake.body[0] = head;
 
 	if (cells[head.x][head.y] == BERRY){
@@ -347,10 +347,27 @@ void step_snake_game(){
 	}
 }
 
+int test_x = 0;
+int test_y = 0;
+void test_pos_to_idx_etc(){
+
+	int n = pos_to_idx(test_x,test_y);
+	ws2812b.setPixelColor(n,ws2812b.Color(brightness,brightness,brightness));
+	test_y++;
+	if (test_y % PIXELS_HEIGHT == 0){
+		test_y = 0;
+		test_x++;
+	}
+	if (test_x % PIXELS_WIDTH == 0){
+		test_x = 0;
+	}
+}
+
+
 void disp_snake_game(){
 
 	for (int x = 0; x < PIXELS_WIDTH; x++){
-		for (int y = 0; y < PIXELS_HEIGHT; y++){
+		for (int y = 0; y < PIXELS_HEIGHT; y++){			 
 			byte n = pos_to_idx(x,y);
 			if(cells[x][y] == BERRY)
 				ws2812b.setPixelColor(n,ws2812b.Color(brightness, 0,0));
@@ -359,10 +376,13 @@ void disp_snake_game(){
 		}
 	}
 
+	Serial.printf("Display Snake at: ");
 	for (size_t i = 0; i < snake.len; i++){
+		Serial.printf("(%d,%d),",snake.body[i].x,snake.body[i].y);
 		byte n = pos_to_idx(snake.body[i].x,snake.body[i].y);
 		ws2812b.setPixelColor(n,ws2812b.Color(0,brightness,0));
 	}
+	Serial.println();
 
 	if (snake.has_lost){
 		scroll_disp_str("HAHA Du Noob!", false);
@@ -561,7 +581,7 @@ void loop() {
 	if (millis() > last_frame + sgame.speed_ms){
 		last_frame = millis();
 		// disp_cells(1,0,0);
-
+		// test_pos_to_idx_etc();
 		disp_snake_game();	
 
 		if (is_i_run)
