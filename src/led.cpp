@@ -6,7 +6,6 @@ bool is_on = true;
 uint8_t brightness = 5;
 uint8_t max_bright = 150;
 uint8_t step_bright = 15;
-bool is_i_run = true;
 
 void led_begin() {
     ws2812b.begin();
@@ -26,10 +25,6 @@ void turn_disp_off() {
 }
 void turn_disp_on() {
     is_on = true;
-}
-
-bool is_led_running() {
-    return is_i_run;
 }
 
 byte get_brightness() {

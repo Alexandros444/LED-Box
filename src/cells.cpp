@@ -3,6 +3,8 @@
 byte survival_rule[] = {2,3};
 byte birth_rule[] = {3,4};
 
+
+
 byte safe_cell_lookup(int x, int y) {
 	if (x < 0 || y < 0 || x >= PIXELS_WIDTH || y >= PIXELS_HEIGHT) return 0;
 	return cells[x][y];

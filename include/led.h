@@ -11,7 +11,6 @@ void turn_disp_off();
 void turn_disp_on();
 void inc_brightness();
 void dec_brightness();
-bool is_led_running();
 byte get_brightness();
 void led_set_true_color(byte n, byte r, byte g, byte b);
 void led_set_data(byte n, bool r, bool g, bool b);

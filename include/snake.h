@@ -6,7 +6,6 @@
 #include "text.h"
 #include <Arduino.h>
 
-void clear_cells(void);
 bool is_point_inside_snake(Point pt);
 void place_berry(void);
 void init_snake();

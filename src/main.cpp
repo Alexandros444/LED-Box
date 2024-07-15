@@ -34,12 +34,12 @@ void loop() {
 	// 	// delay(5);  // 500ms pause between each pixel
 	// }
 
-	if (is_led_running() && is_new_frame_time()) {
+	if (is_new_frame_time()) {
 		step_snake_game();
 	}
 
 	
-	if (millis() > is_new_sim_time()) {
+	if (is_new_sim_time()) {
 		// disp_cells(1,0,0);
 		// test_pos_to_idx_etc();
 		// display_frame(acid_color, acid_color_size);

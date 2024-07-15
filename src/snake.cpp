@@ -20,14 +20,6 @@ void steer_snake(int dir) {
 	sgame.last_input_time = millis();
 }
 
-void clear_cells(void) {
-	for (int x = 0; x < PIXELS_WIDTH; x++){
-		for (int y = 0; y < PIXELS_HEIGHT; y++){
-			cells[x][y] = 0;
-		}
-	}
-}
-
 bool is_point_inside_snake(Point pt){
 	for (int i = 0; i < snake.len; i++){
 		if (snake.body[i].x == pt.x && snake.body[i].y == pt.y)
