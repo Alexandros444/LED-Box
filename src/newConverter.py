@@ -138,5 +138,6 @@ def image_to_c_data():
 
 if __name__ == "__main__":
     # for i in range(-20,0):
-    print(pos_to_idx(32-11,1))
+    # print(pos_to_idx(32-11,1))
+    image_to_c_data()
 

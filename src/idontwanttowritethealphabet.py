@@ -31,6 +31,7 @@ for i in range(0,len(string.ascii_lowercase)):
     lines += f"\tcase \'{char_low}\':\n\t\tret={char_up};\n\t\tbreak;\n"
 
 lines += f"\tcase \'!\':\n\t\tret=ex_mark;\n\t\tbreak;\n"
+lines += f"\tcase \' \':\n\t\tret=space;\n\t\tbreak;\n"
 lines += f"\tdefault:\n\t\tbreak;\n\t"+"}\n\treturn ret;\n}"
 
 

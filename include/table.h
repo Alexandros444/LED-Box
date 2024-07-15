@@ -168,6 +168,9 @@ byte* char_to_led_data(char c) {
 	case '!':
 		ret=ex_mark;
 		break;
+	case ' ':
+		ret=space;
+		break;
 	default:
 		break;
 	}

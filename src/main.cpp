@@ -26,7 +26,7 @@
 Adafruit_NeoPixel ws2812b(NUM_PIXELS, PIN_WS2812B, NEO_GRB + NEO_KHZ800);
 
 bool is_on = true;
-uint8_t brightness = 1;
+uint8_t brightness = 100;
 uint8_t max_bright = 150;
 uint8_t step_bright = 1;
 
@@ -53,11 +53,51 @@ decode_results results;
 uint32_t* frames[] = { test_color, black_color, white_color, I_color, K_color, A_color };
 size_t frame_sizes[] = { test_color_size, black_color_size, white_color_size, I_color_size, K_color_size, A_color_size };
 int i_frame = 0;
-bool is_i_run = false;
+bool is_i_run = true;
 
 byte cells[PIXELS_WIDTH][PIXELS_HEIGHT] = { 0 };
 byte survival_rule[] = {2,3};
 byte birth_rule[] = {3,4};
+
+enum Direction {
+	UP,
+	DOWN,
+	LEFT,
+	RIGHT
+};
+
+enum cell_Flags {
+	GROUND,
+	SNAKE,
+	BERRY
+}; 
+
+struct Point{
+	int x;
+	int y;
+}typedef Point;
+
+struct Snake{
+	int len = 3;
+	const int max_len = 32;
+	Point body[32];
+	int dir = RIGHT;
+	bool has_won = false;
+	bool has_eaten_berry = true;
+	bool has_lost = false;
+};
+
+struct Snake_Game{
+	int speed_ms = 100;
+	const long win_anim_dur_ms = 60000;
+	const long loose_anim_dur_ms = 10000;
+	bool is_anim_playing = false;
+	long anim_start = 0;
+	bool game_started = false;
+};
+
+Snake_Game sgame;
+Snake snake;
 
 int pos_to_idx(int x, int y) {
     int n_row = x * PIXELS_HEIGHT;
@@ -78,6 +118,260 @@ void idx_to_pos(int n, int* x_ret, int* y_ret) {
 
 	*x_ret = x;
 	*y_ret = y;
+}
+
+
+void display_char(int x_pos, char c, bool removeBackground) {
+	byte* disp_frame = char_to_led_data(c);
+	int frame_px_len = sizeof(A) / sizeof(A[0]); // Assume Every Char has the Same Size
+	int frame_width = frame_px_len / PIXELS_HEIGHT;
+	if (x_pos + frame_width <= 0 || x_pos >= PIXELS_WIDTH) return;
+
+	// Start Position of Frame, Top Left if even, Bottom Left if uneven
+	int x_start = x_pos * PIXELS_HEIGHT;
+	// if (x_pos % 2)
+	// 	x_start += PIXELS_HEIGHT - 1;
+
+	// If x_pos < 0, or x_pos > x_len - frame_width
+
+	if (x_pos % 2) {
+		// Serial.printf("\nungerade,%d %d\n\n",x_start, x_pos);
+		int frame_idx = PIXELS_HEIGHT -1;
+		for (int px = x_start; px < NUM_PIXELS && frame_idx < frame_px_len; px++) {
+			// Serial.printf("px %d, fidx %d\n",px,frame_idx);
+			if (px >= 0) {
+				if (disp_frame[frame_idx] != 0 || removeBackground){
+					uint32_t col = ws2812b.Color(brightness * disp_frame[frame_idx], brightness * disp_frame[frame_idx], brightness * disp_frame[frame_idx]);
+					ws2812b.setPixelColor(px, col);
+				}
+			}
+			if (frame_idx % PIXELS_HEIGHT == 0)
+				frame_idx += 2 * PIXELS_HEIGHT;
+			frame_idx--;
+		}
+	} else {
+		int frame_idx = 0;
+		for (int px = x_start; px < NUM_PIXELS && frame_idx < frame_px_len; px++) {
+			if (px >= 0) {
+				if (disp_frame[frame_idx] != 0 || removeBackground){
+					uint32_t col = ws2812b.Color(brightness * disp_frame[frame_idx], brightness * disp_frame[frame_idx], brightness * disp_frame[frame_idx]);
+					ws2812b.setPixelColor(px, col);
+				}
+			}
+			frame_idx++;
+		}
+	}
+		
+
+}
+
+void disp_str(String str, int offset, bool remove_background) {
+	for (int i = 0; i < str.length(); i++) {
+		display_char(i * CHAR_WIDTH + offset, str[i], remove_background);
+	}
+}
+
+void set_scroll_disp_str(String str) {
+	// Start at right
+	scroll_string = str;
+	scroll_width = str.length() * CHAR_WIDTH;
+	scroll_offset = scroll_dir > 0 ? -scroll_width : PIXELS_WIDTH;
+	// scroll_distance = PIXELS_WIDTH - str.length() * CHAR_WIDTH;
+}
+
+void scroll_disp_str(String str, bool remove_background) {
+	if (scroll_string != str) set_scroll_disp_str(str);
+	disp_str(scroll_string, scroll_offset, remove_background);
+	scroll_offset += scroll_dir;
+
+	bool str_end_out_right = scroll_offset + scroll_width > PIXELS_WIDTH;
+	bool str_at_right_edge = scroll_offset + scroll_width >= PIXELS_WIDTH;
+	bool str_out_right = scroll_offset >= PIXELS_WIDTH;
+
+	bool str_start_out_left = scroll_offset < 0;
+	bool str_at_left_edge = scroll_offset < 0;
+	bool str_out_left = scroll_offset + scroll_width < 0;
+
+	bool scroll_left = scroll_dir < 0;
+	bool scroll_right = scroll_dir > 0;
+
+	if (scroll_width > PIXELS_WIDTH){
+		str_at_right_edge = scroll_offset >= 0;
+		str_at_left_edge = scroll_offset + scroll_width <= PIXELS_WIDTH;
+	}
+
+
+	if (bounce && bounce_at_str_start && (scroll_left && str_at_left_edge || scroll_right && str_at_right_edge)){
+		scroll_dir = -scroll_dir;
+		return;
+	}
+
+	if (scroll_left && str_out_left) {
+		if (bounce) scroll_dir = -scroll_dir;
+		else scroll_offset = PIXELS_WIDTH;
+	}
+	else if (scroll_right && str_out_right) {
+		if (bounce) scroll_dir = -scroll_dir;
+		else scroll_offset = -scroll_width;
+	}
+}
+
+
+
+void clear_cells(void){
+	for (int x = 0; x < PIXELS_WIDTH; x++){
+		for (int y = 0; y < PIXELS_HEIGHT; y++){
+			cells[x][y] = 0;
+		}
+	}
+}
+
+bool is_point_inside_snake(Point pt){
+	for (int i = 0; i < snake.len; i++){
+		if (snake.body[i].x == pt.x && snake.body[i].y == pt.y)
+			return true;
+	}
+	return false;
+}
+
+void place_berry(void){
+	Point new_berry_place;
+	new_berry_place.x = rand() % PIXELS_WIDTH;
+	new_berry_place.y = rand() % PIXELS_HEIGHT;
+	
+	while (is_point_inside_snake(new_berry_place)){
+		new_berry_place.x = rand() % PIXELS_WIDTH;
+		new_berry_place.y = rand() % PIXELS_HEIGHT;
+		Serial.print("Placed Berry in Snake");
+	}
+	
+	Serial.printf("Placed Berry x:%d, y:%d",new_berry_place.x,new_berry_place.y);
+	cells[new_berry_place.x][new_berry_place.y] = BERRY;
+
+}
+
+void init_snake(){
+	snake.len = 3;
+	snake.dir = RIGHT;
+	snake.body[0].x = 3;
+	snake.body[0].y = 2;
+	snake.body[1].x = 2;
+	snake.body[1].y = 2;
+	snake.body[2].x = 1;
+	snake.body[2].y = 2;	
+	snake.has_won = false;
+	snake.has_eaten_berry = true;
+	snake.has_lost = false;
+}
+
+void init_snake_game(){
+	clear_cells();
+	sgame.is_anim_playing = false;
+	sgame.speed_ms = 100;
+	sgame.game_started = true;
+}
+
+void step_snake(){
+	Point head = snake.body[0];
+	switch (snake.dir)	{
+	case RIGHT:
+		head.x++;
+		break;
+	case LEFT:
+		head.x--;
+		break;
+	case UP:
+		head.y--;
+		break;
+	case DOWN:
+		head.y++;
+		break;
+	default:
+		break;
+	}
+
+	if (head.x < 0 || head.y < 0 || head.x >= PIXELS_WIDTH || head.y >= PIXELS_HEIGHT || is_point_inside_snake(head)){
+		snake.has_lost = true;
+		return;
+	}
+	
+	Serial.printf("Snake Body: ");
+	for (int i = 0; i < snake.max_len-1; i++){
+		snake.body[i+1] = snake.body[i];
+		Serial.printf("(%d,%d)",snake.body[i].x,snake.body[i].y);
+	}
+	Serial.println();
+	snake.body[0] = head;
+
+	if (cells[head.x][head.y] == BERRY){
+		snake.len++;
+		snake.has_eaten_berry = true;
+	}
+	if (snake.len >= snake.max_len){
+		snake.has_won = true;
+		Serial.printf("SNAKE WON HOW %d >= %d",snake.len,snake.max_len);
+	}
+
+	Serial.printf("Head: x:%d y:%d\nidx:%d, dir:%d\nlen:%d, mxlen%d\n",head.x,head.y,pos_to_idx(head.x,head.y),snake.dir,snake.len,snake.max_len);
+
+
+}
+
+void start_new_game(){
+	init_snake();
+	init_snake_game();
+}
+
+void step_snake_game(){
+	if (!sgame.game_started)
+		start_new_game();
+
+	if ((snake.has_won || snake.has_lost ) && !sgame.is_anim_playing){
+		Serial.printf("Snake hast lost:%d won:%d\n Start animation.",snake.has_lost,snake.has_won);
+		sgame.is_anim_playing = true;
+		sgame.anim_start = millis();
+	}
+	bool win_anim_finished = (snake.has_won && millis() > sgame.win_anim_dur_ms + sgame.anim_start);
+	bool loose_anim_finished = (snake.has_lost && millis() > sgame.loose_anim_dur_ms + sgame.anim_start);
+	if (sgame.is_anim_playing && (win_anim_finished || loose_anim_finished)){
+		start_new_game();
+	}
+	if (sgame.is_anim_playing) return;
+
+	step_snake();
+
+	if (snake.has_eaten_berry){
+		clear_cells();
+		place_berry();
+		snake.has_eaten_berry = false;
+	}
+}
+
+void disp_snake_game(){
+
+	for (int x = 0; x < PIXELS_WIDTH; x++){
+		for (int y = 0; y < PIXELS_HEIGHT; y++){
+			byte n = pos_to_idx(x,y);
+			if(cells[x][y] == BERRY)
+				ws2812b.setPixelColor(n,ws2812b.Color(brightness, 0,0));
+			else
+			 	ws2812b.setPixelColor(n,0x00);
+		}
+	}
+
+	for (size_t i = 0; i < snake.len; i++){
+		byte n = pos_to_idx(snake.body[i].x,snake.body[i].y);
+		ws2812b.setPixelColor(n,ws2812b.Color(0,brightness,0));
+	}
+
+	if (snake.has_lost){
+		scroll_disp_str("HAHA Du Noob!", false);
+	}
+
+	if (snake.has_won){
+		scroll_disp_str("Gewonnen.", false);
+	}
+	
 }
 
 byte safe_cell_lookup(int x, int y) {
@@ -189,10 +483,10 @@ void receive_ir_code(uint32_t code) {
 		i_frame--;
 		break;
 	case R_code:
-		frame_ms -= 10;
+		sgame.speed_ms -= 20;
 		break;
 	case B_code:
-		frame_ms += 100;
+		sgame.speed_ms += 100;
 		break;
 	case G_code:
 		bounce = !bounce;
@@ -201,12 +495,7 @@ void receive_ir_code(uint32_t code) {
 		random_splash(30);
 		break;
 	case Fade_code:
-		for (int x = 0; x < PIXELS_WIDTH; x++){
-			for (int y = 0; y < PIXELS_HEIGHT; y++){
-				cells[x][y] = 0;
-			}
-			
-		}
+		clear_cells();
 		break;
 		
 	default:
@@ -215,103 +504,6 @@ void receive_ir_code(uint32_t code) {
 		break;
 	}
 }
-
-void display_char(int x_pos, char c, bool removeBackground) {
-	byte* disp_frame = char_to_led_data(c);
-	int frame_px_len = sizeof(A) / sizeof(A[0]); // Assume Every Char has the Same Size
-	int frame_width = frame_px_len / PIXELS_HEIGHT;
-	if (x_pos + frame_width <= 0 || x_pos >= PIXELS_WIDTH) return;
-
-	// Start Position of Frame, Top Left if even, Bottom Left if uneven
-	int x_start = x_pos * PIXELS_HEIGHT;
-	// if (x_pos % 2)
-	// 	x_start += PIXELS_HEIGHT - 1;
-
-	// If x_pos < 0, or x_pos > x_len - frame_width
-
-	if (x_pos % 2) {
-		// Serial.printf("\nungerade,%d %d\n\n",x_start, x_pos);
-		int frame_idx = PIXELS_HEIGHT -1;
-		for (int px = x_start; px < NUM_PIXELS && frame_idx < frame_px_len; px++) {
-			// Serial.printf("px %d, fidx %d\n",px,frame_idx);
-			if (px >= 0) {
-				if (disp_frame[frame_idx] != 0 || removeBackground){
-					uint32_t col = ws2812b.Color(brightness * disp_frame[frame_idx], brightness * disp_frame[frame_idx], brightness * disp_frame[frame_idx]);
-					ws2812b.setPixelColor(px, col);
-				}
-			}
-			if (frame_idx % PIXELS_HEIGHT == 0)
-				frame_idx += 2 * PIXELS_HEIGHT;
-			frame_idx--;
-		}
-	} else {
-		int frame_idx = 0;
-		for (int px = x_start; px < NUM_PIXELS && frame_idx < frame_px_len; px++) {
-			if (px >= 0) {
-				if (disp_frame[frame_idx] != 0 || removeBackground){
-					uint32_t col = ws2812b.Color(brightness * disp_frame[frame_idx], brightness * disp_frame[frame_idx], brightness * disp_frame[frame_idx]);
-					ws2812b.setPixelColor(px, col);
-				}
-			}
-			frame_idx++;
-		}
-	}
-		
-
-}
-
-void disp_str(String str, int offset, bool remove_background) {
-	for (int i = 0; i < str.length(); i++) {
-		display_char(i * CHAR_WIDTH + offset, str[i], remove_background);
-	}
-}
-
-void set_scroll_disp_str(String str) {
-	// Start at right
-	scroll_string = str;
-	scroll_width = str.length() * CHAR_WIDTH;
-	scroll_offset = scroll_dir > 0 ? -scroll_width : PIXELS_WIDTH;
-	// scroll_distance = PIXELS_WIDTH - str.length() * CHAR_WIDTH;
-}
-
-void scroll_disp_str(String str, bool remove_background) {
-	if (scroll_string != str) set_scroll_disp_str(str);
-	disp_str(scroll_string, scroll_offset, remove_background);
-	scroll_offset += scroll_dir;
-
-	bool str_end_out_right = scroll_offset + scroll_width > PIXELS_WIDTH;
-	bool str_at_right_edge = scroll_offset + scroll_width >= PIXELS_WIDTH;
-	bool str_out_right = scroll_offset >= PIXELS_WIDTH;
-
-	bool str_start_out_left = scroll_offset < 0;
-	bool str_at_left_edge = scroll_offset < 0;
-	bool str_out_left = scroll_offset + scroll_width < 0;
-
-	bool scroll_left = scroll_dir < 0;
-	bool scroll_right = scroll_dir > 0;
-
-	if (scroll_width > PIXELS_WIDTH){
-		str_at_right_edge = scroll_offset >= 0;
-		str_at_left_edge = scroll_offset + scroll_width <= PIXELS_WIDTH;
-	}
-
-
-	if (bounce && bounce_at_str_start && (scroll_left && str_at_left_edge || scroll_right && str_at_right_edge)){
-		scroll_dir = -scroll_dir;
-		return;
-	}
-
-	if (scroll_left && str_out_left) {
-		if (bounce) scroll_dir = -scroll_dir;
-		else scroll_offset = PIXELS_WIDTH;
-	}
-	else if (scroll_right && str_out_right) {
-		if (bounce) scroll_dir = -scroll_dir;
-		else scroll_offset = -scroll_width;
-	}
-}
-
-
 
 void display_frame(uint32_t* frame, int len) {
 	// float brightness_scale = ((float)brightness) / 255;
@@ -366,21 +558,22 @@ void loop() {
 	// 	// delay(5);  // 500ms pause between each pixel
 	// }
 
-	if (millis() > last_frame + frame_ms){
+	if (millis() > last_frame + sgame.speed_ms){
 		last_frame = millis();
-		disp_cells(1,0,0);
-		
+		// disp_cells(1,0,0);
+
+		disp_snake_game();	
+
 		if (is_i_run)
 		{
-			run_cells_step();
+			step_snake_game();
+			// run_cells_step();
 		}
 		
 
-
-
 		// display_frame(neo_color, neo_color_size);
-		scroll_disp_str("Kalina!", false);
-		Serial.printf("Scroll offset: %d\nScroll dir: %d\n",scroll_offset, scroll_dir);
+		// scroll_disp_str("Kalina!", false);
+		// Serial.printf("Scroll offset: %d\nScroll dir: %d\n",scroll_offset, scroll_dir);
 		// pixel_lim++;
 	} 
 
