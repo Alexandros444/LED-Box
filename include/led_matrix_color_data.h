@@ -1,6 +1,6 @@
-#ifndef byte
+#ifndef LED_MATRIX_COLOR_DATA_H
+#define LED_MATRIX_COLOR_DATA_H
 #include <Arduino.h>
-#endif
 
 uint32_t A_color[] = {
 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 
@@ -608,3 +608,4 @@ uint32_t Z_color[] = {
 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, };
 size_t Z_color_size = sizeof(Z_color) / sizeof(Z_color[0]);
 
+#endif

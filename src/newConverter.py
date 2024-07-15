@@ -101,10 +101,14 @@ def image_to_c_data():
     img_tup : tuple[Image.Image,str] = zip(imgs,img_paths)
 
     with open(out_file,"wt") as out:
-        out.write("#ifndef byte\n#include <Arduino.h>\n#endif\n\n")
+        out.write("#ifndef LED_MATRIX_DATA_H\n" \
+                  "#define LED_MATRIX_DATA_H\n" \
+                  "#include <Arduino.h>\n\n")
 
     with open(out_file_color,"wt") as out:
-        out.write("#ifndef byte\n#include <Arduino.h>\n#endif\n\n")
+        out.write("#ifndef LED_MATRIX_COLOR_DATA_H\n" \
+                  "#define LED_MATRIX_COLOR_DATA_H\n" \
+                  "#include <Arduino.h>\n\n")
 
     for img, img_path in img_tup:
         symbol_name = Path(img_path).stem
@@ -132,6 +136,12 @@ def image_to_c_data():
 
         
         img.close()
+
+    with open(out_file,"at") as out:
+        out.write("#endif")
+
+    with open(out_file_color,"at") as out:
+        out.write("#endif")
 
 
 

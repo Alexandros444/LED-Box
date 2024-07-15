@@ -17,9 +17,18 @@ import string
 # 	return ret;
 # }
 
+#ifndef TABLE_H
+#define TABLE_H
+
+#include <Arduino.h>
+#include "led_matrix_data.h"
+
 lines = ""
-lines += "#ifndef byte\n#include <Arduino.h>\n#endif\n\n"
-lines += "#ifndef A\n#include \"led_matrix_data.h\"\n#endif\n\n"
+lines += "#ifndef TABLE_H\n"
+lines += "#define TABLE_H\n"
+lines += "#include <Arduino.h>\n"
+lines += "#include \"led_matrix_data.h\"\n\n"
+
 lines += f"byte* char_to_led_data(char c) "+"{\n"
 lines += f"\tbyte* ret = A;\n"
 lines += f"\tswitch (c) "+"{\n"
@@ -36,9 +45,8 @@ for i in range(0,10):
 lines += f"\tcase \'!\':\n\t\tret=ex_mark;\n\t\tbreak;\n"
 lines += f"\tcase \'.\':\n\t\tret=dot;\n\t\tbreak;\n"
 lines += f"\tcase \' \':\n\t\tret=space;\n\t\tbreak;\n"
-lines += f"\tdefault:\n\t\tbreak;\n\t"+"}\n\treturn ret;\n}"
-
-
+lines += f"\tdefault:\n\t\tbreak;\n\t"+"}\n\treturn ret;\n}\n"
+lines += "#endif"
 
 with open("include/table.h","wt") as out:
     out.write(lines)

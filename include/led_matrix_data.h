@@ -1,6 +1,6 @@
-#ifndef byte
+#ifndef LED_MATRIX_DATA_H
+#define LED_MATRIX_DATA_H
 #include <Arduino.h>
-#endif
 
 byte A[] = {
 0, 0, 0, 0, 0, 0, 0, 0, 
@@ -655,3 +655,4 @@ byte Z[] = {
 
 size_t Z_size = sizeof(Z) / sizeof(Z[0]);
 
+#endif

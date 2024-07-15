@@ -7,17 +7,18 @@
 # Code
 - Mapping von x,y auf LEDs  - DONE
 - Python Script für Image to Frame. Max 8x32px (Alternativ, python script so, dass Frames in Index reihenfolge vorliegen) - Done
-- Alle Buchstaben in 8x4~8x format als BW Frame (Uint8 Arrays)
-- Frame Darstellen, Start position veränderbar machen, bis in bild rein, und aus bild raus (ins minus / über 32)
-- Symbole Herz etc. ("Movie")
-- Frame wechsel mit IR remote, Remote merken von Hexcodes die schon vorkamen, gleicher Frame
-- ggf. Farbframes uint8_t[8x32x3] RGB Frames
-- Helligkeit und Farbe anpassbar machen von BW Frames
-- Background verändern
+- Alle Buchstaben in 8x4~8x format als BW Frame (Uint8 Arrays) - Done
+- Frame Darstellen, Start position veränderbar machen, bis in bild rein, und aus bild raus (ins minus / über 32) - Done
+- Symbole Herz etc. ("Movie") - Done
+- Frame wechsel mit IR remote, Remote merken von Hexcodes die schon vorkamen, gleicher Frame - Done
+- ggf. Farbframes uint8_t[8x32x3] RGB Frames - Done
+- Helligkeit und Farbe anpassbar machen von BW Frames - Done
+- Background verändern - Done
 - Effekte 
 - Changing background
-- Cellular Automata
+- Cellular Automata - Done
 - Acid, Tropfen etc 
+- Snake - Done
 - Effekte
 
 

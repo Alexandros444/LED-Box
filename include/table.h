@@ -1,10 +1,7 @@
-#ifndef byte
+#ifndef TABLE_H
+#define TABLE_H
 #include <Arduino.h>
-#endif
-
-#ifndef A
 #include "led_matrix_data.h"
-#endif
 
 byte* char_to_led_data(char c) {
 	byte* ret = A;
@@ -209,3 +206,4 @@ byte* char_to_led_data(char c) {
 	}
 	return ret;
 }
+#endif
