@@ -165,8 +165,41 @@ byte* char_to_led_data(char c) {
 	case 'z':
 		ret=Z;
 		break;
+	case '0':
+		ret=num0;
+		break;
+	case '1':
+		ret=num1;
+		break;
+	case '2':
+		ret=num2;
+		break;
+	case '3':
+		ret=num3;
+		break;
+	case '4':
+		ret=num4;
+		break;
+	case '5':
+		ret=num5;
+		break;
+	case '6':
+		ret=num6;
+		break;
+	case '7':
+		ret=num7;
+		break;
+	case '8':
+		ret=num8;
+		break;
+	case '9':
+		ret=num9;
+		break;
 	case '!':
 		ret=ex_mark;
+		break;
+	case '.':
+		ret=dot;
 		break;
 	case ' ':
 		ret=space;
