@@ -30,7 +30,6 @@ enum Direction {
 
 enum cell_Flags {
 	GROUND,
-	SNAKE,
 	BERRY
 };
 
@@ -54,7 +53,8 @@ struct Snake_Game{
 	unsigned long last_berry_place = 0;
 	unsigned long last_input_time = 0;
     unsigned long inactivity_timer = 10000;
-    unsigned long sim_speed_ms = 1000;
+	unsigned long sim_speed_ms = 1000;
+	unsigned long last_sim_step_time = 0;
 };
 
 #endif

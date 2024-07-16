@@ -1,6 +1,15 @@
 #include <Arduino.h>
 
+// #include "ir.h"
+// #include "scenes.h"
+// #include "timing.h"
+// #include "board.h"
+
+#include "led.h"
+#include "board.h"
+#include "config.h"
 #include "ir.h"
+#include "scenes.h"
 
 void setup() {
 	Serial.begin(115200);
@@ -12,14 +21,22 @@ void setup() {
 
 	// random_splash(50);
 	led_clear();
+	start_new_scene();
+	// ws2812b.begin();
 }
 
 // unsigned long time_stamp1 = 0;
 // unsigned long time_stamp2 = 0;
 
+
 void loop() {
 
 	ir_receive();
+	// scroll_disp_str("Kalin", true);
+	run_scene();
+	disp_scene();
+
+	led_show();
 
 	// ws2812b.clear();  // set all pixel colors to 'off'. It only takes effect if pixels.show() is called
 
@@ -34,17 +51,14 @@ void loop() {
 	// 	// delay(5);  // 500ms pause between each pixel
 	// }
 
-	if (is_new_frame_time()) {
-		step_snake_game();
-	}
-
+	// run_scene();
+	// test_pos_to_idx_etc();
 	
-	if (is_new_sim_time()) {
+	// if (is_new_frame_time()) {
 		// disp_cells(1,0,0);
 		// test_pos_to_idx_etc();
 		// display_frame(acid_color, acid_color_size);
 		// test_idx_to_pos_etc();
-		disp_snake_game();
 
 		// scroll_disp_str(" ",false);
 		// time_stamp1 = micros();
@@ -57,12 +71,12 @@ void loop() {
 		// scroll_disp_str("Kalina!", false);
 		// Serial.printf("Scroll offset: %d\nScroll dir: %d\n",scroll_offset, scroll_dir);
 		// pixel_lim++;
-	} 
+	// } 
+	// led_show();                                     // update to the WS2812B Led Strip
 
 	// if (i_frame > PIXELS_WIDTH) i_frame = - 6 * CHAR_WIDTH;
 	// 	disp_str("Kalina", i_frame);
 	// else 
-	led_show();                                     // update to the WS2812B Led Strip
 }
 
 

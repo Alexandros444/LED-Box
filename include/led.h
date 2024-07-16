@@ -13,6 +13,6 @@ void inc_brightness();
 void dec_brightness();
 byte get_brightness();
 void led_set_true_color(byte n, byte r, byte g, byte b);
-void led_set_data(byte n, bool r, bool g, bool b);
+void led_set_data(byte n, byte r, byte g, byte b);
 
 #endif

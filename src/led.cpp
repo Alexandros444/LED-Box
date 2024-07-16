@@ -1,6 +1,6 @@
 #include "led.h"
 
-Adafruit_NeoPixel ws2812b(NUM_PIXELS, PIN_WS2812B, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel ws2812b_2(NUM_PIXELS, PIN_WS2812B, NEO_GRB + NEO_KHZ800);
 
 bool is_on = true;
 uint8_t brightness = 5;
@@ -8,17 +8,17 @@ uint8_t max_bright = 150;
 uint8_t step_bright = 15;
 
 void led_begin() {
-    ws2812b.begin();
+    ws2812b_2.begin();
 }
 
 void led_clear() {
-    ws2812b.clear();
+    ws2812b_2.clear();
 }
 
 void led_show() {
-    if (is_on)
-        ws2812b.clear();
-    ws2812b.show();
+    if (!is_on)
+        ws2812b_2.clear();
+    ws2812b_2.show();
 }
 void turn_disp_off() {
     is_on = false;
@@ -35,11 +35,11 @@ void led_set_true_color(byte n, byte r, byte g, byte b) {
     r = r * brightness / 255;
     g = g * brightness / 255;
     b = b * brightness / 255;
-    ws2812b.setPixelColor(n, ws2812b.Color(r, g, b));
+    ws2812b_2.setPixelColor(n, ws2812b_2.Color(r, g, b));
 }
 
-void led_set_data(byte n, bool r, bool g, bool b) {
-    ws2812b.setPixelColor(n, ws2812b.Color(brightness * r, brightness * g, brightness * b));
+void led_set_data(byte n, byte r, byte g, byte b) {
+    ws2812b_2.setPixelColor(n, ws2812b_2.Color(brightness * (r & 0x1), brightness * (g & 0x1), brightness * (b & 0x1)));
 }
 
 

@@ -5,12 +5,10 @@ Snake snake;
 
 void inc_game_speed() {
 	sgame.sim_speed_ms /= 2;
-	set_sim_ms(sgame.sim_speed_ms);
 }
 
 void dec_game_speed() {
 	sgame.sim_speed_ms = sgame.sim_speed_ms * 2 + 1;
-	set_sim_ms(sgame.sim_speed_ms);
 }
 
 void steer_snake(int dir) {
@@ -104,7 +102,7 @@ void init_snake_game(){
 	sgame.is_anim_playing = false;
 	sgame.game_started = true;
 	sgame.berrys = 0;
-	set_sim_ms(sgame.sim_speed_ms);
+	sgame.last_sim_step_time = 0;
 }
 
 void step_snake(){
@@ -192,6 +190,10 @@ void do_auto_move() {
 }
 
 void step_snake_game() {
+	if (millis() < sgame.last_sim_step_time + sgame.sim_speed_ms)
+		return;
+	sgame.last_sim_step_time = millis();
+
 	if (!sgame.game_started)
 		start_new_game();
 

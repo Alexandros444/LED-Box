@@ -15,5 +15,6 @@ inline byte cells[PIXELS_WIDTH][PIXELS_HEIGHT];
 int pos_to_idx(int x, int y);
 void idx_to_pos(int n, int* x_ret, int* y_ret);
 void clear_cells(void);
+void test_pos_to_idx_etc();
 
 #endif
