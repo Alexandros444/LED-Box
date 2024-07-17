@@ -1,14 +1,15 @@
 #include "web.h"
 
 const char* ssid = "Leave Kalina a Message!";
-const char* password = "12345678";
 
 WebServer server(80);
 
 // Pre-allocated memory for the input string (1024 + 1 for null terminator)
 char inputString[1025] = { 0 };
 
-bool is_running = false;
+bool is_web_running = false;
+unsigned long web_start_time = 0;
+unsigned long web_stay_on_time = 60000;
 
 // HTML web page with a text input field
 const char index_html[] PROGMEM = R"rawliteral(
@@ -138,6 +139,9 @@ void web_start() {
   server.onNotFound(handleNotFound);
   server.begin(); // Web server start
   Serial.println("HTTP server started");
+
+  is_web_running = true;
+  web_start_time = millis();
 }
 
 
@@ -146,15 +150,22 @@ void web_stop(){
 	server.close();
 	WiFi.softAPdisconnect(true);
 	Serial.print("Stopped Wifi-Server");
+	is_web_running = false;
 }
 
 
 void web_run() {
-  // put your main code here, to run repeatedly:
-  //DNS
-  dnsServer.processNextRequest();
-  //HTTP
-  server.handleClient();
+	if (! is_web_running)
+		return;
+	if (millis() > web_start_time + web_stay_on_time)
+		web_stop();
+
+	
+	// put your main code here, to run repeatedly:
+	//DNS
+	dnsServer.processNextRequest();
+	//HTTP
+	server.handleClient();
 }
 
 void web_disp() {
