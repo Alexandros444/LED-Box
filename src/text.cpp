@@ -2,21 +2,31 @@
 
 int scroll_offset = 0;
 int scroll_distance = 0;
-String scroll_string = "";
+char *scroll_string = nullptr;
+int scroll_n_chars = 0;
 int scroll_width = 0;
 int scroll_dir = -1;
 bool bounce = true;
 bool bounce_at_str_start = true;
 
+// unsigned long last_scroll_step_time = 0;
+unsigned long scroll_step_time_ms = 200;
+
 void toggle_bounce() {
 	bounce = !bounce;
 }
 
+void inc_scroll_speed() {
+	scroll_step_time_ms /= 2;
+}
+
+void dec_scroll_speed() {
+	scroll_step_time_ms = scroll_step_time_ms * 2 + 1;
+}
+
 void display_char(int x_pos, char c, bool removeBackground) {
 	byte* disp_frame = char_to_led_data(c);
-	int frame_px_len = sizeof(A) / sizeof(A[0]); // Assume Every Char has the Same Size
-	int frame_width = frame_px_len / PIXELS_HEIGHT;
-	if (x_pos + frame_width <= 0 || x_pos >= PIXELS_WIDTH) return;
+	if (x_pos + CHAR_WIDTH <= 0 || x_pos >= PIXELS_WIDTH) return;
 
 	// Start Position of Frame, Top Left if even, Bottom Left if uneven
 	int x_start = x_pos * PIXELS_HEIGHT;
@@ -28,12 +38,13 @@ void display_char(int x_pos, char c, bool removeBackground) {
 	if (x_pos % 2) {
 		// Serial.printf("\nungerade,%d %d\n\n",x_start, x_pos);
 		int frame_idx = PIXELS_HEIGHT -1;
-		for (int px = x_start; px < NUM_PIXELS && frame_idx < frame_px_len; px++) {
+		for (int px = x_start; px < NUM_PIXELS && frame_idx < CHAR_N; px++) {
 			// Serial.printf("px %d, fidx %d\n",px,frame_idx);
 			if (px >= 0) {
-				if ((disp_frame[frame_idx] != 0) || removeBackground) {
-					Serial.printf("Frame idx:%d, data:%d, background:%d\n", frame_idx, disp_frame[frame_idx],removeBackground);
-					led_set_data(px, disp_frame[frame_idx], disp_frame[frame_idx], disp_frame[frame_idx]);
+				byte val = disp_frame[frame_idx];
+				if ((val != 0) || removeBackground) {
+					// Serial.printf("Frame idx:%d, data:%d, background:%d\n", frame_idx, disp_frame[frame_idx],removeBackground);
+					led_set_data(px, val, val, val);
 				}
 			}
 			if (frame_idx % PIXELS_HEIGHT == 0)
@@ -42,11 +53,12 @@ void display_char(int x_pos, char c, bool removeBackground) {
 		}
 	} else {
 		int frame_idx = 0;
-		for (int px = x_start; px < NUM_PIXELS && frame_idx < frame_px_len; px++) {
+		for (int px = x_start; px < NUM_PIXELS && frame_idx < CHAR_N; px++) {
 			if (px >= 0) {
-				if ((disp_frame[frame_idx] != 0) || removeBackground) {
-					Serial.printf("Frame idx:%d, data:%d, background:%d\n", frame_idx, disp_frame[frame_idx],removeBackground);
-					led_set_data(px, disp_frame[frame_idx], disp_frame[frame_idx], disp_frame[frame_idx]);
+				byte val = disp_frame[frame_idx];
+				if ((val != 0) || removeBackground) {
+					// Serial.printf("Frame idx:%d, data:%d, background:%d\n", frame_idx, disp_frame[frame_idx],removeBackground);
+					led_set_data(px, val, val, val);
 				}
 			}
 			frame_idx++;
@@ -56,23 +68,35 @@ void display_char(int x_pos, char c, bool removeBackground) {
 
 }
 
-void disp_str(String str, int offset, bool remove_background) {
-	for (int i = 0; i < str.length(); i++) {
+void disp_str(const char str[], int offset, bool remove_background) {
+	for (int i = 0; i < scroll_n_chars; i++) {
+		// tick();
 		display_char(i * CHAR_WIDTH + offset, str[i], remove_background);
+		// tock("Disp Char");
 	}
 }
 
-void set_scroll_disp_str(String str) {
+void set_scroll_disp_str(const char str[]) {
 	// Start at right
-	scroll_string = str;
-	scroll_width = str.length() * CHAR_WIDTH;
+	scroll_string = (char*)str;
+	tick();
+	scroll_n_chars = strlen(str);
+	tock("Strlen Time:");
+	Serial.printf("Setting New String %s\n\rMemory addr: %p, String Length: %d\n", str,&str,scroll_n_chars);
+	scroll_width = scroll_n_chars * CHAR_WIDTH;
 	scroll_offset = scroll_dir > 0 ? -scroll_width : PIXELS_WIDTH;
 	// scroll_distance = PIXELS_WIDTH - str.length() * CHAR_WIDTH;
 }
 
-void scroll_disp_str(String str, bool remove_background) {
+void scroll_disp_str(const char str[], bool remove_background) {
+	static unsigned long last_scroll_step_time = 0;
 	if (scroll_string != str) set_scroll_disp_str(str);
-	disp_str(scroll_string, scroll_offset, remove_background);
+	else if (millis() < last_scroll_step_time + scroll_step_time_ms) {
+		disp_str(str, scroll_offset, remove_background);	
+		return;
+	}
+	last_scroll_step_time = millis();
+	disp_str(str, scroll_offset, remove_background);
 	scroll_offset += scroll_dir;
 
 	bool str_end_out_right = scroll_offset + scroll_width > PIXELS_WIDTH;

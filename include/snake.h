@@ -57,4 +57,7 @@ struct Snake_Game{
 	unsigned long last_sim_step_time = 0;
 };
 
+static const char snake_loose_msg[] = "Haha du Looser!";
+static const char snake_win_msg[] = "Gewonnen!";
+
 #endif

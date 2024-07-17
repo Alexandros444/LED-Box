@@ -13,6 +13,28 @@ bool is_new_frame_time() {
     return false;
 }
 
+
+unsigned long tick_time[256] = { 0 };
+byte tick_time_index = 0;
+
+void tick() {
+    if (tick_time_index == 255) {
+        Serial.println("Tick overflow");
+        return;
+    }
+    tick_time[tick_time_index++] = micros();
+}
+
+void tock(String msg) {
+    Serial.printf("%s: %ld\n\r", msg, micros() - tick_time[--tick_time_index]);
+}
+
+void tockTick(String msg) {
+    if (tick_time_index != 0)
+        tock(msg);
+    tick();
+}
+
 // bool is_new_sim_time() {
 //     if (millis() > last_sim + sim_ms) {
 //         last_sim = millis();

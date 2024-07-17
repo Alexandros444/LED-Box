@@ -10,6 +10,7 @@
 #include "config.h"
 #include "ir.h"
 #include "scenes.h"
+#include "timing.h"
 
 void setup() {
 	Serial.begin(115200);
@@ -30,13 +31,18 @@ void setup() {
 
 
 void loop() {
-
+	// tick();
+	// tick();
 	ir_receive();
+	// tockTick("IR");
 	// scroll_disp_str("Kalin", true);
 	run_scene();
+	// tockTick("RUN");
 	disp_scene();
-
+	// tockTick("DISP");
 	led_show();
+	// tock("LED");
+	// tock("Full Loop");
 
 	// ws2812b.clear();  // set all pixel colors to 'off'. It only takes effect if pixels.show() is called
 

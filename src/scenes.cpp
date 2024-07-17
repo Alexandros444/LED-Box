@@ -1,5 +1,7 @@
 #include "scenes.h"
 
+int current_scene = KALINA;
+const int num_scenes = 4;
 
 void switch_scene() {
     current_scene = (current_scene + 1) % num_scenes;
@@ -8,6 +10,8 @@ void switch_scene() {
 }
 
 void set_scene(int scene) {
+    if (current_scene == scene)
+        return;
     current_scene = scene;
     Serial.printf("Active Scene %d\n",current_scene);
     start_new_scene();
@@ -20,9 +24,11 @@ void start_new_scene() {
     case KALINA:
         break;
     case SNAKE:
+        clear_cells();
         step_snake_game();
         break;
     case CELL:
+        clear_cells();
         random_splash(30);
         random_splash(30);
         random_splash(30);
@@ -67,7 +73,6 @@ void end_scene() {
     case SNAKE:
         break;
     case CELL:
-        clear_cells();
         break;
     case ANIM:
         break;
@@ -79,13 +84,13 @@ void end_scene() {
     }
 }
 
-
-
 void disp_scene() {
     switch (current_scene)
     {
     case KALINA:
-        scroll_disp_str("KALINA!", true);
+        // tick();
+        scroll_disp_str(kalina_greeting, true);
+        // tock("Scroll Disp");
         break;
     case SNAKE:
         disp_snake_game();
@@ -103,7 +108,8 @@ void disp_scene() {
     }
 }
 
-int activate_web_server = 3;
+int activate_web = 3;
+unsigned long activate_web_last_input_time = 0;
 
 void scene_handle_input(uint32_t code) {
     switch (code) {
@@ -111,11 +117,14 @@ void scene_handle_input(uint32_t code) {
         turn_disp_off();
         break;
     case On_code:
-        activate_web_server--;
+        if (millis() > activate_web_last_input_time + 10000)
+            activate_web = 3;
+        activate_web--;
+        activate_web_last_input_time = millis();
         turn_disp_on();
-        if (activate_web_server <= 0) {
+        if (activate_web <= 0) {
             set_scene(WEB);
-            activate_web_server = 3;
+            activate_web = 3;
         }
         break;
     case bright_code:
@@ -126,9 +135,13 @@ void scene_handle_input(uint32_t code) {
         break;
     case R_code:
         inc_game_speed();
+        inc_scroll_speed();
+        inc_cell_speed();
         break;
     case B_code:
         dec_game_speed();
+        dec_scroll_speed();
+        dec_cell_speed();
         break;
     case G_code:
         toggle_bounce();

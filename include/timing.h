@@ -3,7 +3,10 @@
 
 #include <Arduino.h>
 bool is_new_frame_time();
-bool is_new_sim_time();
 // void set_sim_ms(unsigned long ms);
+
+void tick();
+void tock(String msg);
+void tockTick(String msg);
 
 #endif

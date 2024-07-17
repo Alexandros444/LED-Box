@@ -3,7 +3,7 @@
 Adafruit_NeoPixel ws2812b_2(NUM_PIXELS, PIN_WS2812B, NEO_GRB + NEO_KHZ800);
 
 bool is_on = true;
-uint8_t brightness = 5;
+uint8_t brightness = 25;
 uint8_t max_bright = 150;
 uint8_t step_bright = 15;
 

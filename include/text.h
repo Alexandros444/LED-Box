@@ -5,9 +5,11 @@
 #include "led.h"
 #include "config.h"
 #include "table.h"
+#include "timing.h"
 
-void set_scroll_disp_str(String str);
-void scroll_disp_str(String str, bool remove_background);
+void scroll_disp_str(const char str[], bool remove_background);
 void toggle_bounce();
+void inc_scroll_speed();
+void dec_scroll_speed();
 
 #endif

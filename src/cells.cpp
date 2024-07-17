@@ -3,7 +3,16 @@
 byte survival_rule[] = {2,3};
 byte birth_rule[] = {3,4};
 
+unsigned long last_cell_step_time = 0;
+unsigned long cell_step_time_ms = 200;
 
+void inc_cell_speed() {
+	cell_step_time_ms /= 2;
+}
+
+void dec_cell_speed() {
+	cell_step_time_ms = cell_step_time_ms * 2 + 1;
+}
 
 byte safe_cell_lookup(int x, int y) {
 	if (x < 0 || y < 0 || x >= PIXELS_WIDTH || y >= PIXELS_HEIGHT) return 0;
@@ -48,6 +57,9 @@ int n_cell_neighbours(int x, int y) {
 }
 
 void run_cells_step(void) {
+	if (millis() < last_cell_step_time + cell_step_time_ms)
+		return;
+	last_cell_step_time = millis();
 	for (int x = 0; x < PIXELS_WIDTH; x++) {
 		for (int y = 0; y < PIXELS_HEIGHT; y++) {
 			int alive_neighbours = n_cell_neighbours(x, y);

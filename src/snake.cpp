@@ -244,11 +244,11 @@ void disp_snake_game(){
 	// Serial.println();
 
 	if (snake.has_lost) {
-		scroll_disp_str("HAHA Du Looser!", false);
+		scroll_disp_str(snake_loose_msg, false);
 	}
 
 	if (snake.has_won){
-		scroll_disp_str("Gewonnen.", false);
+		scroll_disp_str(snake_win_msg, false);
 	}
 	
 }

@@ -7,8 +7,6 @@ WebServer server(80);
 // Pre-allocated memory for the input string (1024 + 1 for null terminator)
 char inputString[1025] = { 0 };
 
-int test_2[] = {1,2,3,4};
-
 bool is_web_running = false;
 unsigned long web_start_time = 0;
 unsigned long web_stay_on_time = 600000;

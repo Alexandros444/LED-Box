@@ -7,6 +7,8 @@
 #include "web.h"
 #include "ir_codes.h"
 #include "frames.h"
+#include "timing.h"
+#include "messages.h"
 
 enum SCENES {
     KALINA,
@@ -22,8 +24,7 @@ void disp_scene();
 void start_new_scene();
 void scene_handle_input(uint32_t val);
 
-inline int current_scene = WEB;
-inline const int num_scenes = 5;
-
+extern int current_scene;
+extern const int num_scenes;
 
 #endif

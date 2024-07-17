@@ -10,6 +10,7 @@ struct Point {
 	int y;
 }typedef Point;
 
+
 inline byte cells[PIXELS_WIDTH][PIXELS_HEIGHT];
 
 int pos_to_idx(int x, int y);

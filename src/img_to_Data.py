@@ -62,7 +62,7 @@ def pos_to_idx(x,y, y_len=8):
 
 
 def pixel_to_data(pix, out_name, n_pix):
-    lines = f"inline byte {out_name}[{n_pix}] = " + "{\n"
+    lines = f"byte {out_name}[] = " + "{\n"
     for i in range(0, n_pix):
         px,py = idx_to_pos(i)
         if i % 8 == 0 and i != 0:
@@ -79,7 +79,7 @@ def pixel_to_color_data(pix, out_name, n_pix):
     """
     32 Bit, WRGB each 8-Bit in this order MSB White, LSB Blue
     """
-    lines = f"inline uint32_t {out_name}[{n_pix}] = " + "{\n"
+    lines = f"uint32_t {out_name}[] = " + "{\n"
     for i in range(0, n_pix):
         px,py = idx_to_pos(i)
         if i % 8 == 0 and i != 0:
@@ -126,19 +126,19 @@ def image_to_c_data():
         img_n_pix = img.width*img.height
         
         # Data output
-        lines_data_h += pixel_to_data(pix, symbol_name, img.width*img.height)
-        lines_data_h += f"inline size_t {symbol_name}_size = sizeof({symbol_name}) / sizeof({symbol_name}[0]);\n\n"
+        lines_data_cpp += pixel_to_data(pix, symbol_name, img.width*img.height)
+        lines_data_cpp += f"size_t {symbol_name}_size = {img_n_pix} * sizeof(byte);\n\n"
 
-        # lines_data_h += f"extern byte {symbol_name}[];\n"
-        # lines_data_h += f"extern size_t {symbol_name}_size;\n"
+        lines_data_h += f"extern byte {symbol_name}[];\n"
+        lines_data_h += f"extern size_t {symbol_name}_size;\n"
 
         symbol_name = symbol_name+"_color"
         # Color Data output
-        lines_color_h += pixel_to_color_data(pix, symbol_name, img.width*img.height)
-        lines_color_h += f"inline size_t {symbol_name}_size = sizeof({symbol_name}) / sizeof({symbol_name}[0]);\n\n"
+        lines_color_cpp += pixel_to_color_data(pix, symbol_name, img.width*img.height)
+        lines_color_cpp += f"size_t {symbol_name}_size =  {img_n_pix} * sizeof(uint32_t);\n\n"
 
-        # lines_color_h += f"extern byte {symbol_name}[];\n"
-        # lines_color_h += f"extern size_t {symbol_name}_size;\n"
+        lines_color_h += f"extern uint32_t {symbol_name}[];\n"
+        lines_color_h += f"extern size_t {symbol_name}_size;\n"
 
         img.close()
 
@@ -147,12 +147,12 @@ def image_to_c_data():
 
     with open(out_file_data_h,"wt") as out:
         out.write(lines_data_h)
-    # with open(out_file_data_cpp,"wt") as out:
-    #     out.write(lines_data_cpp)
+    with open(out_file_data_cpp,"wt") as out:
+        out.write(lines_data_cpp)
     with open(out_file_color_h,"wt") as out:
         out.write(lines_color_h)
-    # with open(out_file_color_cpp,"wt") as out:
-    #     out.write(lines_color_cpp)
+    with open(out_file_color_cpp,"wt") as out:
+        out.write(lines_color_cpp)
 
 
 if __name__ == "__main__":
