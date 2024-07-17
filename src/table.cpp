@@ -1,7 +1,7 @@
 #include "table.h"
 
 byte* char_to_led_data(char c) {
-    byte* ret = A;
+    byte* ret = space;
 	switch (c) {
 	case 'A':
 		ret=A;

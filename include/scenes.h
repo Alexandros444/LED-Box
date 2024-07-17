@@ -22,7 +22,7 @@ void disp_scene();
 void start_new_scene();
 void scene_handle_input(uint32_t val);
 
-inline int current_scene = KALINA;
+inline int current_scene = WEB;
 inline const int num_scenes = 5;
 
 

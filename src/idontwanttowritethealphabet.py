@@ -27,7 +27,7 @@ lines = ""
 lines += "#include \"table.h\"\n"
 
 lines += f"byte* char_to_led_data(char c) "+"{\n"
-lines += f"\tbyte* ret = A;\n"
+lines += f"\tbyte* ret = space;\n"
 lines += f"\tswitch (c) "+"{\n"
 
 for i in range(0,len(string.ascii_lowercase)):

@@ -3,6 +3,9 @@
 
 #include <WiFi.h>
 #include <WebServer.h>
+#include <WiFiClient.h>
+#include <DNSServer.h>
+
 #include "text.h"
 
 void web_start();
