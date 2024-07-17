@@ -1,6 +1,6 @@
 #include "scenes.h"
 
-int current_scene = KALINA;
+int current_scene = WEB;
 const int num_scenes = 4;
 
 void switch_scene() {
@@ -101,7 +101,7 @@ void disp_scene() {
     case ANIM:
         break;
     case WEB:
-        web_disp();
+        disp_web();
         break;
     default:
         break;

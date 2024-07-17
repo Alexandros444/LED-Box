@@ -95,7 +95,7 @@ void handleInput() {
 	}
 	server.sendHeader("Location", "/");
 	server.send(303);
-	Serial.println(inputString);
+	Serial.printf("Server got String: %d, %s",strlen(inputString),inputString);
 }
 
 void handleNotFound() {
@@ -177,7 +177,8 @@ void web_run() {
 	//HTTP
 	server.handleClient();
 }
-
-void web_disp() {
-	scroll_disp_str(inputString, true);
+#include "messages.h"
+void disp_web() {
+	Serial.printf("Print Web");
+	scroll_disp_str(verylongmsg, true);
 }

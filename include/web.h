@@ -11,7 +11,7 @@
 void web_start();
 void web_run();
 void web_stop();
-void web_disp();
+void disp_web();
 
 extern bool is_web_running;
 

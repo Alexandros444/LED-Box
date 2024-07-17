@@ -5,9 +5,9 @@ int scroll_distance = 0;
 char *scroll_string = nullptr;
 int scroll_n_chars = 0;
 int scroll_width = 0;
-int scroll_dir = -1;
+int scroll_dir = 1;
 bool bounce = true;
-bool bounce_at_str_start = true;
+bool bounce_at_str_start = false;
 
 // unsigned long last_scroll_step_time = 0;
 unsigned long scroll_step_time_ms = 200;
@@ -26,7 +26,7 @@ void dec_scroll_speed() {
 
 void display_char(int x_pos, char c, bool removeBackground) {
 	byte* disp_frame = char_to_led_data(c);
-	if (x_pos + CHAR_WIDTH <= 0 || x_pos >= PIXELS_WIDTH) return;
+	if ((x_pos + CHAR_WIDTH <= 0) || (x_pos >= PIXELS_WIDTH)) return;
 
 	// Start Position of Frame, Top Left if even, Bottom Left if uneven
 	int x_start = x_pos * PIXELS_HEIGHT;
@@ -37,6 +37,7 @@ void display_char(int x_pos, char c, bool removeBackground) {
 
 	if (x_pos % 2) {
 		// Serial.printf("\nungerade,%d %d\n\n",x_start, x_pos);
+		// Serial.printf("Ungerade Start: %d\n\r",x_start);
 		int frame_idx = PIXELS_HEIGHT -1;
 		for (int px = x_start; px < NUM_PIXELS && frame_idx < CHAR_N; px++) {
 			// Serial.printf("px %d, fidx %d\n",px,frame_idx);
@@ -52,11 +53,13 @@ void display_char(int x_pos, char c, bool removeBackground) {
 			frame_idx--;
 		}
 	} else {
+		// Serial.printf("Gerade Start: %d, bis %d\n\r",x_start, );
 		int frame_idx = 0;
 		for (int px = x_start; px < NUM_PIXELS && frame_idx < CHAR_N; px++) {
 			if (px >= 0) {
 				byte val = disp_frame[frame_idx];
 				if ((val != 0) || removeBackground) {
+					// Serial.printf(",ger: %d",px);
 					// Serial.printf("Frame idx:%d, data:%d, background:%d\n", frame_idx, disp_frame[frame_idx],removeBackground);
 					led_set_data(px, val, val, val);
 				}
@@ -69,21 +72,21 @@ void display_char(int x_pos, char c, bool removeBackground) {
 }
 
 void disp_str(const char str[], int offset, bool remove_background) {
-	for (int i = 0; i < scroll_n_chars; i++) {
+	for (int i = 0; i < scroll_width; i++) {
 		// tick();
+		// Serial.printf("\n\r%d Len, Displaying char %c\n\r",scroll_width, str[i]);
 		display_char(i * CHAR_WIDTH + offset, str[i], remove_background);
+		// delay(1000);
 		// tock("Disp Char");
 	}
 }
 
 void set_scroll_disp_str(const char str[]) {
 	// Start at right
-	scroll_string = (char*)str;
-	tick();
-	scroll_n_chars = strlen(str);
-	tock("Strlen Time:");
-	Serial.printf("Setting New String %s\n\rMemory addr: %p, String Length: %d\n", str,&str,scroll_n_chars);
-	scroll_width = scroll_n_chars * CHAR_WIDTH;
+	scroll_string = (char*) str;
+	scroll_width = strlen(str);
+	Serial.printf("Setting New String %s\n\rMemory addr: %p, String Length: %d\n", str,&str,scroll_width);
+	// scroll_width = scroll_n_chars * CHAR_WIDTH;
 	scroll_offset = scroll_dir > 0 ? -scroll_width : PIXELS_WIDTH;
 	// scroll_distance = PIXELS_WIDTH - str.length() * CHAR_WIDTH;
 }
