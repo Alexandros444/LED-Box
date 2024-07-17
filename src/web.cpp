@@ -7,25 +7,27 @@ WebServer server(80);
 // Pre-allocated memory for the input string (1024 + 1 for null terminator)
 char inputString[1025] = { 0 };
 
+int test_2[] = {1,2,3,4};
+
 bool is_web_running = false;
 unsigned long web_start_time = 0;
-unsigned long web_stay_on_time = 60000;
+unsigned long web_stay_on_time = 600000;
 
 // HTML web page with a text input field
 const char index_html[] PROGMEM = R"rawliteral(
 <!DOCTYPE HTML><html>
 <head>
-  <title>ESP32 Input Form</title>
+  <title>Message for Kalina</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-  <h2>ESP32 Input Form</h2>
+  <h2>Message for Kalina</h2>
   <form action="/get">
 	<label for="inputString">Enter String (max 1024 chars):</label><br><br>
 	<input type="text" id="inputString" name="inputString" maxlength="1024"><br><br>
 	<input type="submit" value="Submit">
   </form>
-  <h2>Your Message:</h2>
+  <h2>Current Message:</h2>
   <p>%input%</p>
 </body>
 </html>)rawliteral";
@@ -99,49 +101,59 @@ void handleInput() {
 }
 
 void handleNotFound() {
-  if (is_host_ip()) { 
-	return;
-  }
-  String message = F("File Not Found\n\n");
-  message += F("URI: ");
-  message += server.uri();
-  message += F("\nMethod: ");
-  message += (server.method() == HTTP_GET) ? "GET" : "POST";
-  message += F("\nArguments: ");
-  message += server.args();
-  message += F("\n");
+	if (!is_host_ip()) { 
+		redirect_to_host();
+		return;
+	}
+	// Serial.print("Not found, Redirecting");
+	String message = F("File Not Found\n\n");
+	message += F("URI: ");
+	message += server.uri();
+	message += F("\nMethod: ");
+	message += (server.method() == HTTP_GET) ? "GET" : "POST";
+	message += F("\nArguments: ");
+	message += server.args();
+	message += F("\n");
 
-  for (uint8_t i = 0; i < server.args(); i++) {
-	message += String(F(" ")) + server.argName(i) + F(": ") + server.arg(i) + F("\n");
-  }
-  server.sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-  server.sendHeader("Pragma", "no-cache");
-  server.sendHeader("Expires", "-1");
-  server.send(404, "text/plain", message);
+	for (uint8_t i = 0; i < server.args(); i++) {
+		message += String(F(" ")) + server.argName(i) + F(": ") + server.arg(i) + F("\n");
+	}
+	server.sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+	server.sendHeader("Pragma", "no-cache");
+	server.sendHeader("Expires", "-1");
+	server.send(404, "text/plain", message);
 }
 
 void web_start() {
-  Serial.println("Configuring access point...");
-  WiFi.softAPConfig(apIP, apIP, netMsk);
-  // its an open WLAN access point without a password parameter
-  WiFi.softAP(ssid);
-  Serial.print("AP IP address: ");
-  Serial.println(WiFi.softAPIP());
+	Serial.println("Configuring access point...");
+	WiFi.softAPConfig(apIP, apIP, netMsk);
+	// its an open WLAN access point without a password parameter
+	WiFi.softAP(ssid);
+	Serial.print("AP IP address: ");
+	Serial.println(WiFi.softAPIP());
 
-  /* Setup the DNS server redirecting all the domains to the apIP */
-  dnsServer.setErrorReplyCode(DNSReplyCode::NoError);
-  dnsServer.start(DNS_PORT, "*", apIP);
+	/* Setup the DNS server redirecting all the domains to the apIP */
+	dnsServer.setErrorReplyCode(DNSReplyCode::NoError);
+	dnsServer.start(DNS_PORT, "*", apIP);
 
-  /* Setup the web server */
-  server.on("/", handleRoot);
-  server.on("/generate_204", handleRoot);
-  server.on("/get", handleInput);
-  server.onNotFound(handleNotFound);
-  server.begin(); // Web server start
-  Serial.println("HTTP server started");
+	/* Setup the web server */
+	server.on("/", handleRoot);
+	server.on("/generate_204", handleRoot);
+	server.on("/redirect", handleRoot); // microsoft redirect
+	server.on("/hotspot-detect.html",handleRoot); // apple call home
+	server.on("/canonical.html", handleRoot);// firefox captive portal call home
+	server.on("/success.txt", handleRoot);// firefox captive portal call home
+	server.on("/ncsi.txt", handleRoot);
+	server.on("/ncsi.txt", handleRoot);
 
-  is_web_running = true;
-  web_start_time = millis();
+
+	server.on("/get", handleInput);
+	server.onNotFound(handleNotFound);
+	server.begin(); // Web server start
+	Serial.println("HTTP server started");
+
+	is_web_running = true;
+	web_start_time = millis();
 }
 
 
@@ -149,7 +161,7 @@ void web_stop(){
 	dnsServer.stop();
 	server.close();
 	WiFi.softAPdisconnect(true);
-	Serial.print("Stopped Wifi-Server");
+	Serial.println("Stopped Wifi-Server");
 	is_web_running = false;
 }
 
