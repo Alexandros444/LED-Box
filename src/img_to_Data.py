@@ -119,10 +119,13 @@ def image_to_c_data():
 
     for img, img_path in img_tup:
         symbol_name = Path(img_path).stem
+        symbol_name = symbol_name.replace("Ä","AE")
+        symbol_name = symbol_name.replace("Ü","UE")
+        symbol_name = symbol_name.replace("Ö","OE")
         
         img : Image.Image = img.convert("RGB")
         pix = img.load()
-        print(img_path,img.size)
+        print(img_path,img.size, symbol_name)
         img_n_pix = img.width*img.height
         
         # Data output

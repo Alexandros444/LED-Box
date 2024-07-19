@@ -1,7 +1,7 @@
 #include "cells.h"
 
 byte survival_rule[] = {2,3};
-byte birth_rule[] = {3,4};
+byte birth_rule[] = {3};
 
 unsigned long last_cell_step_time = 0;
 unsigned long cell_step_time_ms = 200;

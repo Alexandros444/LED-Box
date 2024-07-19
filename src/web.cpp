@@ -5,7 +5,9 @@ const char* ssid = "Leave Kalina a Message!";
 WebServer server(80);
 
 // Pre-allocated memory for the input string (1024 + 1 for null terminator)
-char inputString[1025] = { 0 };
+char inputString[1025] = "Enter String over Wifi.";
+// const char web_placeholder_str[] = "Enter String over Wifi.";
+// char *web_disp_str = (char*)web_placeholder_str;
 
 bool is_web_running = false;
 unsigned long web_start_time = 0;
@@ -91,11 +93,18 @@ void handleRoot() {
 void handleInput() {
 	if (server.hasArg("inputString")) {
 		String input = server.arg("inputString");
+		// strncpy(inputString,input.c_str(),1025);
 		input.toCharArray(inputString, 1025); // Copy string to pre-allocated buffer
+		// for (int i = 0; i < strlen(inputString)+1; i++){
+		// 	Serial.printf("(%c,%x)",inputString[i]);
+		// }
+		
 	}
 	server.sendHeader("Location", "/");
 	server.send(303);
-	Serial.printf("Server got String: %d, %s",strlen(inputString),inputString);
+	// web_disp_str = inputString;
+	Serial.printf("\nServer got String: %d, %s",strlen(inputString),inputString);
+	scroll_disp_force_new_str(inputString,0);
 }
 
 void handleNotFound() {
@@ -163,6 +172,7 @@ void web_stop(){
 	is_web_running = false;
 }
 
+#include "messages.h"
 
 void web_run() {
 	if (! is_web_running)
@@ -170,7 +180,7 @@ void web_run() {
 	if (millis() > web_start_time + web_stay_on_time)
 		web_stop();
 
-	
+	// strncpy(inputString,verylongmsg,sizeof(verylongmsg));
 	// put your main code here, to run repeatedly:
 	//DNS
 	dnsServer.processNextRequest();
@@ -179,6 +189,6 @@ void web_run() {
 }
 #include "messages.h"
 void disp_web() {
-	Serial.printf("Print Web");
-	scroll_disp_str(verylongmsg, true);
+	// Serial.printf("Print Web");
+	scroll_disp_str(inputString, true, 0);
 }

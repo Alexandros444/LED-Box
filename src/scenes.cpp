@@ -1,7 +1,11 @@
 #include "scenes.h"
 
-int current_scene = WEB;
+int current_scene = KALINA;
 const int num_scenes = 4;
+
+char *disp_str[] = {(char*)kalina_greeting,(char*)kalina_laengsten, (char*)verylongmsg};
+int disp_str_idx = 0;
+int disp_str_size = sizeof(disp_str) / sizeof(char*);
 
 void switch_scene() {
     current_scene = (current_scene + 1) % num_scenes;
@@ -89,7 +93,8 @@ void disp_scene() {
     {
     case KALINA:
         // tick();
-        scroll_disp_str(kalina_greeting, true);
+        if (scroll_disp_str(disp_str[disp_str_idx], true, 2))
+            disp_str_idx=(disp_str_idx+1) % disp_str_size;
         // tock("Scroll Disp");
         break;
     case SNAKE:
@@ -159,7 +164,7 @@ void scene_handle_input(uint32_t code) {
         steer_snake(LEFT);
         break;
     case Strobe_code:
-        random_splash(30);
+        random_splash(50);
         break;
     case Fade_code:
         clear_cells();
