@@ -1,6 +1,5 @@
 #include "table.h"
 byte* char_to_led_data(char c) {
-	// Serial.printf("(%c,%x)",c,c);
 	byte* ret = space;
 	switch (c) {
 	case 'A':
@@ -207,8 +206,14 @@ byte* char_to_led_data(char c) {
 	case '\x99':
 		ret=OE;
 		break;
-	case 0xDF:
+	case '\xel':
 		ret=SZ;
+		break;
+	case ':':
+		ret=dotdot;
+		break;
+	case '?':
+		ret=q_mark;
 		break;
 	case '!':
 		ret=ex_mark;

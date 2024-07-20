@@ -10,6 +10,8 @@ bool bounce = true;
 bool bounce_at_str_start = false;
 int n_bounces_left = 0;
 
+uint8_t *disp_color = (uint8_t*)WHITE; 
+
 
 // unsigned long last_scroll_step_time = 0;
 unsigned long scroll_step_time_ms = 200;
@@ -24,6 +26,10 @@ void inc_scroll_speed() {
 
 void dec_scroll_speed() {
 	scroll_step_time_ms = scroll_step_time_ms * 2 + 1;
+}
+
+void set_color(const uint8_t col[]){
+	disp_color = (uint8_t*)col;
 }
 
 void display_char(int x_pos, char c, bool removeBackground) {
@@ -49,7 +55,7 @@ void display_char(int x_pos, char c, bool removeBackground) {
 				byte val = disp_frame[frame_idx];
 				if ((val != 0) || removeBackground) {
 					// Serial.printf("Frame idx:%d, data:%d, background:%d\n", frame_idx, disp_frame[frame_idx],removeBackground);
-					led_set_data(px, val, val, val);
+					led_set_scaled_color(px, val * disp_color[0], val * disp_color[1], val *  disp_color[2]);
 				}
 			}
 			if (frame_idx % PIXELS_HEIGHT == 0)
@@ -65,7 +71,7 @@ void display_char(int x_pos, char c, bool removeBackground) {
 				if ((val != 0) || removeBackground) {
 					// Serial.printf(",ger: %d",px);
 					// Serial.printf("Frame idx:%d, data:%d, background:%d\n", frame_idx, disp_frame[frame_idx],removeBackground);
-					led_set_data(px, val, val, val);
+					led_set_scaled_color(px, val * disp_color[0], val * disp_color[1], val * disp_color[2]);
 				}
 			}
 			frame_idx++;

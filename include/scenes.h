@@ -9,6 +9,7 @@
 #include "frames.h"
 #include "timing.h"
 #include "messages.h"
+#include "colors.h"
 
 enum SCENES {
     KALINA,

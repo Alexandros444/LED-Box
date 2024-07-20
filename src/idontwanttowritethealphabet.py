@@ -54,7 +54,8 @@ lines += f"\tcase '\\xel':\n\t\tret=SZ;\n\t\tbreak;\n"
 # ö \x94
 # Ö \x99
 # ß \xe1
-
+lines += f"\tcase \':\':\n\t\tret=dotdot;\n\t\tbreak;\n"
+lines += f"\tcase \'?\':\n\t\tret=q_mark;\n\t\tbreak;\n"
 lines += f"\tcase \'!\':\n\t\tret=ex_mark;\n\t\tbreak;\n"
 lines += f"\tcase \'.\':\n\t\tret=dot;\n\t\tbreak;\n"
 lines += f"\tcase \' \':\n\t\tret=space;\n\t\tbreak;\n"

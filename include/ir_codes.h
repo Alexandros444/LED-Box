@@ -23,4 +23,10 @@ static const uint32_t Purple2_code   = 0xF748B7;
 static const uint32_t Fade_code      = 0xF7C837;
 static const uint32_t GreenBlue_code = 0xF7A857;
 static const uint32_t Pink_code      = 0xF76897;
+
+static const uint32_t FLASHTWO       = 0xFF9867;
+static const uint32_t SPEEDTWO       = 0xFF52AD;
+static const uint32_t SLOWTWO        = 0xFF4AB5;
+static const uint32_t DMX            = 0xFFE21D;
+static const uint32_t FADETWO            = 0xFF02FD;
 #endif

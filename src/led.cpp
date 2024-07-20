@@ -31,10 +31,26 @@ byte get_brightness() {
     return brightness;
 }
 
+void led_disp_frame(uint32_t* frame, int len){
+    for (int i = 0; i < len && i < NUM_PIXELS; i++){
+        uint8_t r = (frame[i] >> 16) & 0xFF;
+        uint8_t g = (frame[i] >> 8) & 0xFF;
+        uint8_t b = frame[i] & 0xFF;
+        led_set_scaled_color(i,r,g,b);
+    }
+}
+
 void led_set_true_color(byte n, byte r, byte g, byte b) {
     r = r * brightness / 255;
     g = g * brightness / 255;
     b = b * brightness / 255;
+    ws2812b_2.setPixelColor(n, ws2812b_2.Color(r, g, b));
+}
+
+void led_set_scaled_color(byte n, byte r, byte g, byte b) {
+    r = map(r,0,255,0,brightness);
+    g = map(g,0,255,0,brightness);
+    b = map(b,0,255,0,brightness);
     ws2812b_2.setPixelColor(n, ws2812b_2.Color(r, g, b));
 }
 

@@ -16,6 +16,7 @@ void steer_snake(int dir) {
 		return;
 	snake.dir = dir;
 	sgame.last_input_time = millis();
+	stop_auto_move();
 }
 
 bool is_point_inside_snake(Point pt){
@@ -103,6 +104,7 @@ void init_snake_game(){
 	sgame.game_started = true;
 	sgame.berrys = 0;
 	sgame.last_sim_step_time = 0;
+	sgame.auto_move = false;
 }
 
 void step_snake(){
@@ -189,6 +191,14 @@ void do_auto_move() {
 	snake.dir = calc_auto_move_dir_from_pos(snake.body[0].x, snake.body[0].y);
 }
 
+void start_auto_move(){
+	sgame.auto_move = true;
+}
+
+void stop_auto_move(){
+	sgame.auto_move = false;
+}
+
 void step_snake_game() {
 	if (millis() < sgame.last_sim_step_time + sgame.sim_speed_ms)
 		return;
@@ -202,6 +212,7 @@ void step_snake_game() {
 		sgame.sim_speed_ms = 100;
 		sgame.is_anim_playing = true;
 		sgame.anim_start = millis();
+		set_color(WHITE);
 	}
 	bool win_anim_finished = (snake.has_won && millis() > sgame.win_anim_dur_ms + sgame.anim_start);
 	bool loose_anim_finished = (snake.has_lost && millis() > sgame.loose_anim_dur_ms + sgame.anim_start);
@@ -211,8 +222,12 @@ void step_snake_game() {
 	if (sgame.is_anim_playing) return;
 
 	if (millis() > sgame.last_input_time + sgame.inactivity_timer) {
-		do_auto_move();
+		start_auto_move();
 	}
+
+	if (sgame.auto_move)
+		do_auto_move();
+
 
 	step_snake();
 

@@ -1,9 +1,9 @@
 #include "scenes.h"
 
 int current_scene = KALINA;
-const int num_scenes = 4;
+const int num_scenes = 3;
 
-char *disp_str[] = {(char*)kalina_greeting,(char*)kalina_laengsten, (char*)verylongmsg};
+char *disp_str[] = {(char*)kalina_greeting,(char*)kalina_laengsten, (char*)kalina_subwoofer};
 int disp_str_idx = 0;
 int disp_str_size = sizeof(disp_str) / sizeof(char*);
 
@@ -73,6 +73,7 @@ void end_scene() {
     switch (current_scene)
     {
     case KALINA:
+        set_color(WHITE);
         break;
     case SNAKE:
         break;
@@ -93,8 +94,9 @@ void disp_scene() {
     {
     case KALINA:
         // tick();
-        if (scroll_disp_str(disp_str[disp_str_idx], true, 2))
-            disp_str_idx=(disp_str_idx+1) % disp_str_size;
+        disp_message();
+        // if (scroll_disp_str(disp_str[disp_str_idx], true, 2))
+        //     disp_str_idx=(disp_str_idx+1) % disp_str_size;
         // tock("Scroll Disp");
         break;
     case SNAKE:
@@ -115,6 +117,8 @@ void disp_scene() {
 
 int activate_web = 3;
 unsigned long activate_web_last_input_time = 0;
+int activate_auto_snake = 3;
+unsigned long activate_auto_snake_last_input_time = 0;
 
 void scene_handle_input(uint32_t code) {
     switch (code) {
@@ -142,20 +146,46 @@ void scene_handle_input(uint32_t code) {
         inc_game_speed();
         inc_scroll_speed();
         inc_cell_speed();
+        // set_color(RED);
+        break;
+    case SPEEDTWO:
+        inc_game_speed();
+        inc_scroll_speed();
+        inc_cell_speed();
+        // set_color(RED);
         break;
     case B_code:
         dec_game_speed();
         dec_scroll_speed();
         dec_cell_speed();
+        // set_color(BLUE);
+        break;
+    case SLOWTWO:
+        dec_game_speed();
+        dec_scroll_speed();
+        dec_cell_speed();
+        // set_color(BLUE);
         break;
     case G_code:
         toggle_bounce();
+        // set_color(GREEN);
+        break;
+    case Orange_code:
+        set_color(RED);
+        break;
+    case Blue_code:
+        set_color(BLUE);
+        break;    
+    case W_code:
+        set_color(WHITE);
         break;
     case Green_code:
         steer_snake(UP);
+        set_color(GREEN);
         break;
     case Purple_code:
         steer_snake(RIGHT);
+        set_color(PURPLE);
         break;
     case Teal2_code:
         steer_snake(DOWN);
@@ -170,11 +200,44 @@ void scene_handle_input(uint32_t code) {
         clear_cells();
         break;
     case Flash_code:
+        toggle_background();
+        break;
+    case FLASHTWO:
+        toggle_background();
         break;
     case Smooth_code:
         switch_scene();
         break;
-
+    case FADETWO:
+        switch_scene();
+        break;
+    case Pink_code:
+        set_color(PINK);
+        break;
+    case Teal_code:
+        set_color(TEAL);
+        if (millis() > activate_auto_snake_last_input_time + 5000)
+            activate_auto_snake = 3;
+        activate_auto_snake--;
+        activate_auto_snake_last_input_time = millis();
+        turn_disp_on();
+        if (activate_auto_snake <= 0) {
+            start_auto_move();
+            activate_auto_snake = 3;
+        }
+        break;
+    case DMX:
+        set_color(TEAL);
+        if (millis() > activate_auto_snake_last_input_time + 5000)
+            activate_auto_snake = 3;
+        activate_auto_snake--;
+        activate_auto_snake_last_input_time = millis();
+        turn_disp_on();
+        if (activate_auto_snake <= 0) {
+            start_auto_move();
+            activate_auto_snake = 3;
+        }
+        break;
     default:
         // Serial.print("Cant find Code: ");
         // Serial.println(code, HEX);

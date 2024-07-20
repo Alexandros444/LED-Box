@@ -5,6 +5,7 @@
 #include "config.h"
 #include <Arduino.h>
 #include "led.h"
+#include "text.h"
 
 void random_splash(int size);
 void disp_cells(byte r, byte g, byte b);

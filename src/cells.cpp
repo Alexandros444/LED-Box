@@ -23,7 +23,7 @@ void disp_cells(byte r, byte g, byte b) {
 	for (int x = 0; x < PIXELS_WIDTH; x++) {
 		for (int y = 0; y < PIXELS_HEIGHT; y++) {
 			byte idx = pos_to_idx(x, y);
-			led_set_true_color(idx, cells[x][y] * r, cells[x][y] * g, cells[x][y] * b);
+			led_set_scaled_color(idx, cells[x][y] * disp_color[0], cells[x][y] * disp_color[1], cells[x][y] * disp_color[0]);
 		}
 	}
 } 
